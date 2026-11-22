@@ -53,9 +53,9 @@ export function FreeCell({ resume, onExit }: FreeCellProps) {
 				<ActionButton onClick={chooseDeal}>Gioca</ActionButton>
 			</SolitaireBar>
 
-			<div className="mx-auto flex flex-col gap-6">
-				<div className="flex justify-between gap-6">
-					<div className="flex gap-2">
+			<div className="solitaire-8 mx-auto flex flex-col gap-3 sm:gap-6">
+				<div className="flex justify-between gap-1 sm:gap-6">
+					<div className="flex gap-1 sm:gap-2">
 						{state.cells.map((card, index) => (
 							<PileSlot
 								// biome-ignore lint/suspicious/noArrayIndexKey: le quattro celle sono fisse
@@ -75,7 +75,7 @@ export function FreeCell({ resume, onExit }: FreeCellProps) {
 							</PileSlot>
 						))}
 					</div>
-					<div className="flex gap-2">
+					<div className="flex gap-1 sm:gap-2">
 						{state.foundations.map((pile, index) => {
 							const top = pile[pile.length - 1];
 							return (
@@ -100,7 +100,7 @@ export function FreeCell({ resume, onExit }: FreeCellProps) {
 					</div>
 				</div>
 
-				<div className="flex justify-between gap-2">
+				<div className="flex justify-between gap-1 sm:gap-2">
 					{state.tableau.map((cards, index) => (
 						<TableauColumn
 							// biome-ignore lint/suspicious/noArrayIndexKey: le otto colonne sono fisse

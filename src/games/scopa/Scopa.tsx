@@ -69,7 +69,7 @@ export function Scopa({
 					topIds={state.deck.slice(-12).map((c) => c.id)}
 					small
 				/>
-				<div className="flex min-h-40 min-w-80 flex-wrap items-center justify-center gap-2 rounded-xl border-2 border-dashed border-emerald-300/40 p-3">
+				<div className="flex min-h-[calc(var(--card-w)*1.8)] w-full max-w-xl flex-wrap items-center justify-center gap-2 rounded-xl border-2 border-dashed border-emerald-300/40 p-3">
 					{state.table.map((card) => (
 						<div
 							key={card.id}

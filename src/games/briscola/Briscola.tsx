@@ -48,15 +48,15 @@ export function Briscola({ names, difficulty, resume, onExit }: BriscolaProps) {
 
 			<div className="flex flex-wrap items-center justify-center gap-10">
 				<div className="flex flex-col items-center gap-1">
-					<div className="relative h-36 w-36">
+					<div className="relative h-[calc(var(--card-w)*1.8)] w-[calc(var(--card-w)*1.8)]">
 						{/* La briscola girata è l'ultima carta: vola in mano quando viene pescata */}
 						{state.deck.length > 0 && (
-							<div className="absolute top-7 left-0 rotate-90">
+							<div className="absolute top-[calc(var(--card-w)*0.35)] left-0 rotate-90">
 								<NeapolitanCardView card={state.briscola} />
 							</div>
 						)}
 						{state.deck.length > 1 && (
-							<div className="absolute top-0 left-12">
+							<div className="absolute top-0 left-[calc(var(--card-w)*0.6)]">
 								<DeckPile
 									deck="napoletane"
 									count={state.deck.length - 1}
@@ -74,7 +74,7 @@ export function Briscola({ names, difficulty, resume, onExit }: BriscolaProps) {
 					</span>
 				</div>
 
-				<div className="flex min-h-36 min-w-48 gap-3 rounded-xl border-2 border-dashed border-emerald-300/40 p-2">
+				<div className="flex min-h-[calc(var(--card-w)*1.8)] min-w-[calc(var(--card-w)*2.4)] gap-2 sm:gap-3 rounded-xl border-2 border-dashed border-emerald-300/40 p-2">
 					{state.trick.map(({ player, card }) => (
 						<div key={card.id} className="flex flex-col items-center text-xs">
 							<NeapolitanCardView card={card} />

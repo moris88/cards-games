@@ -1,3 +1,4 @@
+import { cardSlotClass } from "../../components/CardFrame";
 import { NeapolitanCardView } from "../../components/NeapolitanCardView";
 import type { NeapolitanCard } from "../../core/deck";
 
@@ -16,7 +17,9 @@ export function CapturePile({ cards, label }: CapturePileProps) {
 						<NeapolitanCardView card={card} small faceDown />
 					</div>
 				))}
-				{cards.length === 0 && <div className="h-20 w-12" />}
+				{cards.length === 0 && (
+					<div className={cardSlotClass("napoletane", true)} />
+				)}
 			</div>
 			{label}
 		</div>

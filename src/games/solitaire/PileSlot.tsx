@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { cardSlotClass } from "../../components/CardFrame";
 
 interface PileSlotProps {
 	drop?: string;
@@ -15,7 +16,7 @@ export function PileSlot({ drop, label, children, onClick }: PileSlotProps) {
 		<div
 			data-drop={drop}
 			onClick={onClick}
-			className="relative grid h-30 w-20 place-items-center rounded-md border-2 border-dashed border-white/30 text-2xl text-white/30"
+			className={`${cardSlotClass("francesi")} relative grid place-items-center rounded-md border-2 border-dashed border-white/30 text-2xl text-white/30`}
 		>
 			<span className="col-start-1 row-start-1">{label}</span>
 			{children && <div className="col-start-1 row-start-1">{children}</div>}

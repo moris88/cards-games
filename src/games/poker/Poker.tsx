@@ -64,7 +64,7 @@ export function Poker({ names, difficulty, resume, onExit }: PokerProps) {
 						small
 						label=""
 					/>
-					<div className="flex min-h-30 min-w-[27rem] gap-2 rounded-xl border-2 border-dashed border-emerald-300/40 p-2">
+					<div className="flex min-h-[calc(var(--card-w)*1.5)] w-[calc(var(--card-w)*5.6)] max-w-full justify-center gap-1 sm:gap-2 rounded-xl border-2 border-dashed border-emerald-300/40 p-2">
 						{state.board.map((card) => (
 							<FrenchCardView key={card.id} card={card} />
 						))}

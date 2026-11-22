@@ -19,7 +19,9 @@ export function CartellaView({
 	onSelect,
 	compact,
 }: CartellaViewProps) {
-	const cell = compact ? "h-5 w-5 text-[0.6rem]" : "h-9 w-9 text-sm";
+	const cell = compact
+		? "h-5 w-5 text-[0.6rem]"
+		: "h-7 w-7 text-xs sm:h-9 sm:w-9 sm:text-sm";
 	// Le caselle vuote hanno un id dalla loro posizione fissa nella griglia
 	const cells = card.flat().map((n, pos) => ({ n, id: n ?? `vuota-${pos}` }));
 	const grid = (

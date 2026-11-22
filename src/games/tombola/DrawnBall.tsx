@@ -13,7 +13,7 @@ export function DrawnBall({ number, paused }: DrawnBallProps) {
 	return (
 		<div className="flex items-center gap-4">
 			<motion.div
-				className="text-6xl"
+				className="text-4xl sm:text-6xl"
 				animate={paused ? { rotate: 0 } : { rotate: [0, -12, 12, -8, 8, 0] }}
 				transition={{
 					duration: 0.8,
@@ -24,7 +24,7 @@ export function DrawnBall({ number, paused }: DrawnBallProps) {
 			>
 				🧺
 			</motion.div>
-			<div className="relative h-36 w-64">
+			<div className="relative h-28 w-56 sm:h-36 sm:w-64">
 				<AnimatePresence mode="popLayout">
 					{number && entry && (
 						<motion.div
@@ -35,7 +35,7 @@ export function DrawnBall({ number, paused }: DrawnBallProps) {
 							transition={{ type: "spring", stiffness: 140, damping: 14 }}
 							className="absolute inset-0 flex items-center gap-3"
 						>
-							<div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full border-4 border-red-900 bg-[radial-gradient(circle_at_30%_30%,#fff,#fde68a)] text-4xl font-black text-red-900 shadow-xl">
+							<div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-4 border-red-900 bg-[radial-gradient(circle_at_30%_30%,#fff,#fde68a)] text-2xl sm:h-24 sm:w-24 sm:text-4xl font-black text-red-900 shadow-xl">
 								{number}
 							</div>
 							<div>

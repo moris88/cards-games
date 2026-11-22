@@ -2,11 +2,28 @@ import { motion } from "framer-motion";
 
 export type DeckType = "napoletane" | "francesi";
 
-/** Proporzioni reali delle immagini: napoletane ~0.6, francesi 2:3 */
-const SIZES: Record<DeckType, { normal: string; small: string }> = {
-	napoletane: { normal: "w-20 h-[8.25rem]", small: "w-12 h-20" },
-	francesi: { normal: "w-20 h-30", small: "w-12 h-[4.5rem]" },
+/**
+ * Larghezza dalle variabili CSS (cambiano con lo schermo) e altezza dalle
+ * proporzioni reali delle immagini: napoletane 330×545, francesi 2:3
+ */
+const ASPECT: Record<DeckType, string> = {
+	napoletane: "aspect-[330/545]",
+	francesi: "aspect-[2/3]",
 };
+const SIZES: Record<DeckType, { normal: string; small: string }> = {
+	napoletane: {
+		normal: `w-[var(--card-w)] ${ASPECT.napoletane}`,
+		small: `w-[var(--card-w-sm)] ${ASPECT.napoletane}`,
+	},
+	francesi: {
+		normal: `w-[var(--card-w)] ${ASPECT.francesi}`,
+		small: `w-[var(--card-w-sm)] ${ASPECT.francesi}`,
+	},
+};
+
+/** Segnaposto con le stesse dimensioni di una carta (pile vuote, spazi) */
+export const cardSlotClass = (deck: DeckType, small = false) =>
+	SIZES[deck][small ? "small" : "normal"];
 
 const backImage = (deck: DeckType) =>
 	`/cards/${deck}/retro.${deck === "napoletane" ? "jpg" : "png"}`;

@@ -1,4 +1,5 @@
 import { ActionButton } from "../../components/ActionButton";
+import { cardSlotClass } from "../../components/CardFrame";
 import { EventOverlay } from "../../components/EventOverlay";
 import { NeapolitanCardView } from "../../components/NeapolitanCardView";
 import { Table } from "../../components/Table";
@@ -79,10 +80,10 @@ export function ClockSolitaire({ resume, onExit }: ClockSolitaireProps) {
 								</div>
 							))}
 							{pile.down.length === 0 && pile.up.length === 0 && (
-								<div className="h-20 w-12" />
+								<div className={cardSlotClass("napoletane", true)} />
 							)}
 						</div>
-						<span className="mt-3 font-semibold">
+						<span className="mt-3 whitespace-nowrap text-[0.6rem] font-semibold sm:text-xs">
 							{PILE_LABELS[i]} · {pile.up.length}/4
 						</span>
 					</div>

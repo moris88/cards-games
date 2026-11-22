@@ -65,7 +65,42 @@
 	}
 }
 
+/* Dimensioni delle carte: si adattano a telefono, tablet e desktop */
+:root {
+	--card-w: 3.25rem;
+	--card-w-sm: 2.25rem;
+}
+@media (min-width: 640px) {
+	:root {
+		--card-w: 4.25rem;
+		--card-w-sm: 2.75rem;
+	}
+}
+@media (min-width: 1024px) {
+	:root {
+		--card-w: 5rem;
+		--card-w-sm: 3rem;
+	}
+}
+/* Telefono in orizzontale: poca altezza, carte più piccole */
+@media (max-height: 500px) and (orientation: landscape) {
+	:root {
+		--card-w: 3rem;
+		--card-w-sm: 2rem;
+	}
+}
+
+/* Solitari a colonne: le carte si stringono per far stare 7 o 8 colonne
+   e, in orizzontale sul telefono, anche l'altezza del tavolo */
+.solitaire-7 {
+	--card-w: min(5rem, calc((100vw - 2.5rem) / 7.6), calc(100dvh / 7.5));
+}
+.solitaire-8 {
+	--card-w: min(5rem, calc((100vw - 2.5rem) / 8.8), calc(100dvh / 7.5));
+}
+
 body {
 	background: #0a3622;
 	color: #f8fafc;
+	overflow-x: hidden;
 }

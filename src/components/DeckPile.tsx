@@ -1,4 +1,4 @@
-import { CardFrame, type DeckType } from "./CardFrame";
+import { CardFrame, cardSlotClass, type DeckType } from "./CardFrame";
 
 interface DeckPileProps {
 	deck: DeckType;
@@ -43,7 +43,9 @@ export function DeckPile({
 						</div>
 					</>
 				) : (
-					<div className="h-20 w-12 rounded-md border-2 border-dashed border-white/30" />
+					<div
+						className={`${cardSlotClass(deck, small)} rounded-md border-2 border-dashed border-white/30`}
+					/>
 				)}
 			</div>
 			{label ?? `Mazzo (${count})`}

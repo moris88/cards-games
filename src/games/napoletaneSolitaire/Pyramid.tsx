@@ -1,4 +1,5 @@
 import { ActionButton } from "../../components/ActionButton";
+import { cardSlotClass } from "../../components/CardFrame";
 import { DeckPile } from "../../components/DeckPile";
 import { EventOverlay } from "../../components/EventOverlay";
 import { NeapolitanCardView } from "../../components/NeapolitanCardView";
@@ -38,10 +39,16 @@ export function Pyramid({ resume, onExit }: PyramidProps) {
 
 			<div className="flex flex-col items-center">
 				{rows.map((indices) => (
-					<div key={indices[0]} className="-mb-16 flex gap-2 last:mb-0">
+					<div
+						key={indices[0]}
+						// Ogni fila copre metà della fila sopra
+						className="flex gap-1 last:mb-0 sm:gap-2"
+						style={{ marginBottom: "calc(var(--card-w) * -0.85)" }}
+					>
 						{indices.map((i) => {
 							const card = state.pyramid[i];
-							if (!card) return <div key={i} className="h-[8.25rem] w-20" />;
+							if (!card)
+								return <div key={i} className={cardSlotClass("napoletane")} />;
 							const free = isFree(state.pyramid, i);
 							return (
 								<div key={i} className={free ? "" : "brightness-75"}>
@@ -77,7 +84,9 @@ export function Pyramid({ resume, onExit }: PyramidProps) {
 							</div>
 						))}
 						{!top && (
-							<div className="h-[8.25rem] w-20 rounded-md border-2 border-dashed border-white/30" />
+							<div
+								className={`${cardSlotClass("napoletane")} rounded-md border-2 border-dashed border-white/30`}
+							/>
 						)}
 					</div>
 					Pozzo

@@ -35,7 +35,7 @@ export function TableauColumn({
 				className={
 					i === 0
 						? ""
-						: `absolute left-0 ${faceDown || i <= faceDownCount ? "top-3" : "top-6"}`
+						: `absolute left-0 ${faceDown || i <= faceDownCount ? "top-[calc(var(--card-w)*0.15)]" : "top-[calc(var(--card-w)*0.32)]"}`
 				}
 			>
 				<DraggableCard
@@ -56,7 +56,7 @@ export function TableauColumn({
 	return (
 		<div
 			data-drop={dropId("tableau", index)}
-			className="min-h-[24rem] w-20 rounded-md border-2 border-white/15"
+			className="min-h-[calc(var(--card-w)*5)] w-[var(--card-w)] rounded-md border-2 border-white/15"
 		>
 			{render(0)}
 		</div>

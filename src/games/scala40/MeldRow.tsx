@@ -8,8 +8,14 @@ interface MeldRowProps {
 
 /** Combinazione esposta sul tavolo, con carte sovrapposte */
 export function MeldRow({ cards, onClick }: MeldRowProps) {
-	const content = cards.map((card) => (
-		<div key={card.id} className="-mr-7 last:mr-0">
+	const content = cards.map((card, i) => (
+		<div
+			key={card.id}
+			style={{
+				marginRight:
+					i < cards.length - 1 ? "calc(var(--card-w-sm) * -0.55)" : 0,
+			}}
+		>
 			<FrenchCardView card={card} small />
 		</div>
 	));

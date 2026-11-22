@@ -40,9 +40,9 @@ export function Klondike({ drawCount, resume, onExit }: KlondikeProps) {
 				<ActionButton onClick={game.restart}>Nuova partita</ActionButton>
 			</SolitaireBar>
 
-			<div className="mx-auto flex flex-col gap-6">
-				<div className="flex justify-between gap-3">
-					<div className="flex gap-3">
+			<div className="solitaire-7 mx-auto flex flex-col gap-3 sm:gap-6">
+				<div className="flex justify-between gap-1 sm:gap-3">
+					<div className="flex gap-1 sm:gap-3">
 						<PileSlot label="↻" onClick={game.draw}>
 							{state.stock.length > 0 && (
 								<FrenchCardView
@@ -52,11 +52,16 @@ export function Klondike({ drawCount, resume, onExit }: KlondikeProps) {
 								/>
 							)}
 						</PileSlot>
-						<div className="flex h-30 w-32">
+						<div className="flex w-[calc(var(--card-w)*1.6)]">
 							{visibleWaste.map((card, i) => {
 								const top = i === visibleWaste.length - 1;
 								return (
-									<div key={card.id} className={i > 0 ? "-ml-14" : ""}>
+									<div
+										key={card.id}
+										style={{
+											marginLeft: i > 0 ? "calc(var(--card-w) * -0.7)" : 0,
+										}}
+									>
 										<DraggableCard
 											card={card}
 											draggable={top}
@@ -72,7 +77,7 @@ export function Klondike({ drawCount, resume, onExit }: KlondikeProps) {
 							})}
 						</div>
 					</div>
-					<div className="flex gap-3">
+					<div className="flex gap-1 sm:gap-3">
 						{state.foundations.map((pile, index) => {
 							const top = pile[pile.length - 1];
 							return (
@@ -97,7 +102,7 @@ export function Klondike({ drawCount, resume, onExit }: KlondikeProps) {
 					</div>
 				</div>
 
-				<div className="flex justify-between gap-3">
+				<div className="flex justify-between gap-1 sm:gap-3">
 					{state.tableau.map((cards, index) => (
 						<TableauColumn
 							// biome-ignore lint/suspicious/noArrayIndexKey: le sette colonne sono fisse

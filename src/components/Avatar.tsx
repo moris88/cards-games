@@ -34,7 +34,7 @@ export function Avatar({ name, mood, seed }: AvatarProps) {
 	return (
 		<motion.svg
 			viewBox="0 0 100 100"
-			className="h-16 w-16 drop-shadow-lg"
+			className="h-11 w-11 drop-shadow-lg sm:h-16 sm:w-16"
 			role="img"
 			aria-label={`${name}: ${mood}`}
 			animate={
