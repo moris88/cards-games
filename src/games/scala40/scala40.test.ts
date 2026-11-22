@@ -44,14 +44,14 @@ describe("scala 40 combinazioni", () => {
 
 describe("scala 40 partita tra CPU", () => {
 	it("le CPU giocano molti turni senza bloccarsi", () => {
-		let s = createGame(3);
+		let s = createGame(["Tu", "A", "B", "C"]);
 		s = { ...s, players: s.players.map((p) => ({ ...p, isHuman: false })) };
 		for (
 			let i = 0;
 			i < 400 && s.phase !== "finePartita" && s.phase !== "fineMano";
 			i++
 		) {
-			s = playCpuTurn(s);
+			s = playCpuTurn(s, "difficile");
 			const cards =
 				s.deck.length +
 				s.discard.length +

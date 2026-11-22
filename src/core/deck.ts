@@ -72,3 +72,14 @@ const NEAPOLITAN_NAMES: Record<number, string> = {
 export function neapolitanName(card: NeapolitanCard): string {
 	return `${NEAPOLITAN_NAMES[card.rank] ?? card.rank} di ${card.suit}`;
 }
+
+/** Mazzo singolo da 52 carte senza jolly (poker) */
+export function createFrenchDeck(): FrenchCard[] {
+	return FRENCH_SUITS.flatMap((suit) =>
+		Array.from({ length: 13 }, (_, i) => ({
+			id: `${suit}-${i + 1}-p`,
+			suit,
+			rank: i + 1,
+		})),
+	);
+}

@@ -1,5 +1,5 @@
 import { createScala40Deck, type FrenchCard, shuffle } from "../../core/deck";
-import { addEvent, type GameEvent } from "../../core/gameEvents";
+import { addEvent, type GameEvent, type Mood } from "../../core/gameEvents";
 import { analyzeMeld, OPENING_POINTS, penaltyValue } from "./scala40Melds";
 
 export const HAND_SIZE = 13;
@@ -36,20 +36,16 @@ export interface S40State {
 
 type Result = S40State | string;
 
-export function createGame(cpuCount: number): S40State {
-	const players: S40Player[] = [
-		{ name: "Tu", isHuman: true },
-		...Array.from({ length: cpuCount }, (_, i) => ({
-			name: `CPU ${i + 1}`,
-			isHuman: false,
-		})),
-	].map((p) => ({
-		...p,
-		hand: [],
-		opened: false,
-		score: 0,
-		eliminated: false,
-	}));
+export function createGame(names: string[]): S40State {
+	const players: S40Player[] = names
+		.map((name, i) => ({ name, isHuman: i === 0 }))
+		.map((p) => ({
+			...p,
+			hand: [],
+			opened: false,
+			score: 0,
+			eliminated: false,
+		}));
 	return dealRound({
 		players,
 		melds: [],
@@ -183,6 +179,8 @@ export function confirmOpening(state: S40State): Result {
 			state.players[state.current].isHuman
 				? `Hai aperto con ${points} punti!`
 				: `${state.players[state.current].name} apre con ${points}`,
+			"info",
+			{ [state.players[state.current].name]: "happy" },
 		),
 	};
 }
@@ -264,6 +262,12 @@ function endRound(state: S40State): S40State {
 		state.events,
 		winner.isHuman ? "Hai chiuso la mano!" : `${winner.name} chiude!`,
 		winner.isHuman ? "win" : "lose",
+		Object.fromEntries(
+			players.map((p, i): [string, Mood] => [
+				p.name,
+				i === state.current ? "happy" : "sad",
+			]),
+		),
 	);
 	for (const [i, p] of players.entries()) {
 		if (!p.isHuman && p.eliminated && !state.players[i].eliminated)

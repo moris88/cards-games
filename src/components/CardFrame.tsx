@@ -1,3 +1,5 @@
+import { motion } from "framer-motion";
+
 export type DeckType = "napoletane" | "francesi";
 
 /** Proporzioni reali delle immagini: napoletane ~0.6, francesi 2:3 */
@@ -6,8 +8,13 @@ const SIZES: Record<DeckType, { normal: string; small: string }> = {
 	francesi: { normal: "w-20 h-30", small: "w-12 h-[4.5rem]" },
 };
 
+const backImage = (deck: DeckType) =>
+	`/cards/${deck}/retro.${deck === "napoletane" ? "jpg" : "png"}`;
+
 interface CardFrameProps {
 	deck: DeckType;
+	/** Id della carta: la stessa carta vola da una zona all'altra del tavolo */
+	layoutId?: string;
 	src?: string;
 	alt?: string;
 	faceDown?: boolean;
@@ -16,9 +23,10 @@ interface CardFrameProps {
 	onClick?: () => void;
 }
 
-/** Carta da gioco con immagine fronte/retro */
+/** Carta da gioco con immagine fronte/retro e animazioni di spostamento */
 export function CardFrame({
 	deck,
+	layoutId,
 	src,
 	alt,
 	faceDown,
@@ -27,27 +35,34 @@ export function CardFrame({
 	onClick,
 }: CardFrameProps) {
 	const size = SIZES[deck][small ? "small" : "normal"];
-	const state = selected ? "-translate-y-4 ring-4 ring-yellow-400" : "";
-	const interactive = onClick ? "cursor-pointer hover:-translate-y-2" : "";
-	const image =
-		faceDown || !src
-			? `/cards/${deck}/retro.${deck === "napoletane" ? "jpg" : "svg"}`
-			: src;
+	const ring = selected ? "ring-4 ring-yellow-400" : "";
+	const covered = faceDown || !src;
+	const image = covered ? backImage(deck) : src;
 
 	return (
-		<button
+		<motion.button
 			type="button"
-			title={faceDown ? "Carta coperta" : alt}
+			layoutId={layoutId}
+			layout
+			transition={{ type: "spring", stiffness: 260, damping: 26 }}
+			animate={{ y: selected ? -16 : 0 }}
+			whileHover={onClick ? { y: selected ? -20 : -8 } : undefined}
+			title={covered ? "Carta coperta" : alt}
 			disabled={!onClick}
 			onClick={onClick}
-			className={`${size} ${state} ${interactive} relative shrink-0 animate-deal overflow-hidden rounded-md bg-white shadow-md shadow-black/40 transition-transform duration-200 select-none disabled:cursor-default`}
+			className={`${size} ${ring} ${onClick ? "cursor-pointer" : "cursor-default"} relative shrink-0 overflow-hidden rounded-md bg-white shadow-md shadow-black/40 select-none [perspective:600px]`}
 		>
-			<img
+			{/* Cambiando faccia la carta si gira */}
+			<motion.img
+				key={covered ? "retro" : "fronte"}
+				initial={{ rotateY: 90 }}
+				animate={{ rotateY: 0 }}
+				transition={{ duration: 0.25 }}
 				src={image}
-				alt={faceDown ? "Carta coperta" : alt}
+				alt={covered ? "Carta coperta" : alt}
 				draggable={false}
 				className="h-full w-full object-fill"
 			/>
-		</button>
+		</motion.button>
 	);
 }

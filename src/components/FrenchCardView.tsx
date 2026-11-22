@@ -22,8 +22,8 @@ export function frenchLabel(card: FrenchCard): string {
 /** Metà dei jolly sono rossi e metà neri, come nei mazzi reali */
 function imageFor(card: FrenchCard): string {
 	if (card.suit === "jolly")
-		return `/cards/francesi/jolly-${card.id.startsWith("jolly-a") ? "rosso" : "nero"}.svg`;
-	return `/cards/francesi/${card.suit}-${card.rank}.svg`;
+		return `/cards/francesi/jolly-${card.id.startsWith("jolly-a") ? "rosso" : "nero"}.png`;
+	return `/cards/francesi/${card.suit}-${card.rank}.png`;
 }
 
 interface FrenchCardViewProps {
@@ -38,6 +38,7 @@ export function FrenchCardView({ card, ...props }: FrenchCardViewProps) {
 	return (
 		<CardFrame
 			deck="francesi"
+			layoutId={card.id}
 			src={imageFor(card)}
 			alt={frenchLabel(card)}
 			{...props}

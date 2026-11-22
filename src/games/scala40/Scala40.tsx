@@ -1,61 +1,77 @@
 import { ActionButton } from "../../components/ActionButton";
-import { CardFrame } from "../../components/CardFrame";
+import { DeckPile } from "../../components/DeckPile";
 import { EventOverlay } from "../../components/EventOverlay";
 import { FrenchCardView } from "../../components/FrenchCardView";
 import { Hand } from "../../components/Hand";
+import { Opponent } from "../../components/Opponent";
 import { Table } from "../../components/Table";
+import type { Difficulty } from "../../core/settings";
 import { MeldRow } from "./MeldRow";
 import { pendingPoints } from "./scala40Logic";
 import { useScala40 } from "./useScala40";
 
 interface Scala40Props {
-	cpuCount: number;
+	names: string[];
+	difficulty: Difficulty;
+	resume: boolean;
 	onExit: () => void;
 }
 
-export function Scala40({ cpuCount, onExit }: Scala40Props) {
-	const game = useScala40(cpuCount);
+export function Scala40({ names, difficulty, resume, onExit }: Scala40Props) {
+	const game = useScala40(names, difficulty, resume);
 	const { state, isHumanTurn } = game;
 	const human = state.players[0];
 	const drawing = isHumanTurn && state.phase === "pesca";
 	const playing = isHumanTurn && state.phase === "gioco";
-	const topDiscard = state.discard[state.discard.length - 1];
 	const roundOver = state.phase === "fineMano" || state.phase === "finePartita";
 
 	return (
 		<Table title="Scala 40" onExit={onExit}>
 			<EventOverlay events={state.events} />
-			<div className="flex flex-wrap justify-center gap-6">
+			<div className="flex flex-wrap justify-center gap-4">
 				{state.players.slice(1).map((p, i) => (
-					<Hand
+					<Opponent
 						key={p.name}
-						cards={p.hand}
-						label={`${p.name} · ${p.score} pt${p.opened ? " · aperto" : ""}${p.eliminated ? " · eliminato" : ""}${state.current === i + 1 && !roundOver ? " ◀" : ""}`}
-						renderCard={(card) => (
-							<FrenchCardView card={card} small faceDown={!roundOver} />
-						)}
-					/>
+						name={p.name}
+						seed={i + 1}
+						active={state.current === i + 1 && !roundOver}
+						events={state.events}
+						info={`${p.score} pt${p.opened ? " · aperto" : ""}${p.eliminated ? " · eliminato" : ""}`}
+					>
+						<Hand
+							cards={p.hand}
+							renderCard={(card) => (
+								<FrenchCardView card={card} small faceDown={!roundOver} />
+							)}
+						/>
+					</Opponent>
 				))}
 			</div>
 
 			<div className="flex flex-wrap items-start justify-center gap-6">
 				<div className="flex gap-3">
-					<button
-						type="button"
-						disabled={!drawing}
-						onClick={game.drawDeck}
-						className="flex flex-col items-center text-xs disabled:opacity-80"
-					>
-						<CardFrame deck="francesi" faceDown />
-						Mazzo ({state.deck.length})
-					</button>
-					<div className="flex flex-col items-center text-xs">
-						{topDiscard && (
-							<FrenchCardView
-								card={topDiscard}
-								onClick={drawing ? game.drawDiscard : undefined}
-							/>
-						)}
+					<DeckPile
+						deck="francesi"
+						count={state.deck.length}
+						topIds={state.deck.slice(-2).map((c) => c.id)}
+						onClick={drawing ? game.drawDeck : undefined}
+					/>
+					<div className="flex flex-col items-center gap-1 text-xs">
+						{/* Le ultime due carte scartate, sovrapposte: lo scarto vola sopra */}
+						<div className="grid">
+							{state.discard.slice(-2).map((card, i, top) => (
+								<div key={card.id} className="col-start-1 row-start-1">
+									<FrenchCardView
+										card={card}
+										onClick={
+											drawing && i === top.length - 1
+												? game.drawDiscard
+												: undefined
+										}
+									/>
+								</div>
+							))}
+						</div>
 						Scarti
 					</div>
 				</div>
@@ -129,7 +145,7 @@ export function Scala40({ cpuCount, onExit }: Scala40Props) {
 
 			<Hand
 				cards={human.hand}
-				label={`Tu · ${human.score} pt${human.opened ? " · aperto" : ""}`}
+				label={`${human.name} · ${human.score} pt${human.opened ? " · aperto" : ""}`}
 				renderCard={(card) => (
 					<FrenchCardView
 						card={card}

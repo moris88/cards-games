@@ -16,6 +16,7 @@ export function NeapolitanCardView({
 	return (
 		<CardFrame
 			deck="napoletane"
+			layoutId={card.id}
 			src={`/cards/napoletane/${card.suit}-${card.rank}.jpg`}
 			alt={neapolitanName(card)}
 			{...props}

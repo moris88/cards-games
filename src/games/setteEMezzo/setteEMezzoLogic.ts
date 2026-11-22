@@ -3,13 +3,12 @@ import {
 	type NeapolitanCard,
 	shuffle,
 } from "../../core/deck";
-import { addEvent, type GameEvent } from "../../core/gameEvents";
+import { addEvent, type GameEvent, type Mood } from "../../core/gameEvents";
+import type { Difficulty } from "../../core/settings";
 
 export const STARTING_CHIPS = 100;
-export const BET = 10;
+export const MIN_BET = 5;
 const TARGET = 7.5;
-/** Sotto questa soglia la CPU chiede carta */
-const CPU_STAND_AT = 5;
 
 export type SevenStatus = "inGioco" | "stai" | "sballato" | "eliminato";
 
@@ -17,6 +16,7 @@ export interface SevenPlayer {
 	name: string;
 	isHuman: boolean;
 	chips: number;
+	bet: number;
 	hand: NeapolitanCard[];
 	status: SevenStatus;
 	/** Esito dell'ultima mano in fiches (positivo = vinto) */
@@ -30,7 +30,9 @@ export interface SevenState {
 	order: number[];
 	turn: number;
 	deck: NeapolitanCard[];
-	phase: "turni" | "fineMano" | "finePartita";
+	/** Carte raccolte a fine mano, che tornano nel mazzo */
+	pile: NeapolitanCard[];
+	phase: "puntate" | "turni" | "fineMano" | "raccolta" | "finePartita";
 	message: string;
 	events: GameEvent[];
 }
@@ -59,63 +61,117 @@ export const isReale = (hand: NeapolitanCard[]) =>
 
 export const isBust = (hand: NeapolitanCard[]) => handScore(hand) > TARGET;
 
-export const cpuWantsCard = (hand: NeapolitanCard[]) =>
-	handScore(hand) < CPU_STAND_AT;
+/** Decisione della CPU: Facile azzarda, Medio si ferma a 5, Difficile calcola la probabilità di sballare */
+export function cpuWantsCard(
+	hand: NeapolitanCard[],
+	deck: NeapolitanCard[],
+	difficulty: Difficulty,
+): boolean {
+	const score = handScore(hand);
+	if (difficulty === "facile")
+		return score < 4 || (score < 6 && Math.random() < 0.5);
+	if (difficulty === "medio") return score < 5;
+	const busting = deck.filter((c) => isBust([...hand, c])).length;
+	return score < TARGET && busting / Math.max(deck.length, 1) < 0.45;
+}
+
+export function cpuBet(chips: number, difficulty: Difficulty): number {
+	const round5 = (n: number) => Math.max(MIN_BET, Math.round(n / 5) * 5);
+	const wanted =
+		difficulty === "facile"
+			? round5(5 + Math.random() * 20)
+			: difficulty === "medio"
+				? 10
+				: round5(chips * 0.12);
+	return Math.min(wanted, chips);
+}
 
 /** Fiches vinte (positive) o perse (negative) dal giocatore contro il banco */
 export function settle(
 	player: NeapolitanCard[],
 	banker: NeapolitanCard[],
+	bet: number,
 ): number {
-	if (isBust(player)) return -BET;
-	if (isBust(banker)) return isReale(player) ? BET * 2 : BET;
-	const p = handScore(player);
-	const b = handScore(banker);
+	if (isBust(player)) return -bet;
+	const win = isReale(player) ? bet * 2 : bet;
+	if (isBust(banker)) return win;
 	// A parità vince il banco
-	if (p <= b) return -BET;
-	return isReale(player) ? BET * 2 : BET;
+	return handScore(player) <= handScore(banker) ? -bet : win;
 }
 
-export function createGame(cpuCount: number): SevenState {
-	const players: SevenPlayer[] = [
-		{ name: "Tu", isHuman: true },
-		...Array.from({ length: cpuCount }, (_, i) => ({
-			name: `CPU ${i + 1}`,
-			isHuman: false,
-		})),
-	].map((p) => ({
+export function createGame(
+	names: string[],
+	difficulty: Difficulty,
+): SevenState {
+	const players: SevenPlayer[] = names
+		.map((name, i) => ({ name, isHuman: i === 0 }))
+		.map((p) => ({
+			...p,
+			chips: STARTING_CHIPS,
+			bet: 0,
+			hand: [],
+			status: "inGioco",
+			lastDelta: 0,
+		}));
+	return startRound(
+		{
+			players,
+			bankerIndex: players.length - 1,
+			order: [],
+			turn: 0,
+			deck: [],
+			pile: [],
+			phase: "puntate",
+			message: "",
+			events: [],
+		},
+		difficulty,
+	);
+}
+
+const alive = (p: SevenPlayer) => p.status !== "eliminato";
+
+/** Nuova mano: mazzo rimescolato, le CPU puntano, il giocatore sceglie la puntata */
+export function startRound(
+	state: SevenState,
+	difficulty: Difficulty,
+): SevenState {
+	const players = state.players.map((p, i) => ({
 		...p,
-		chips: STARTING_CHIPS,
 		hand: [],
-		status: "inGioco",
+		status: alive(p) ? ("inGioco" as const) : p.status,
 		lastDelta: 0,
+		bet:
+			!alive(p) || i === state.bankerIndex || p.isHuman
+				? 0
+				: cpuBet(p.chips, difficulty),
 	}));
-	return dealRound({
+	const banker = players[state.bankerIndex];
+	return {
+		...state,
 		players,
-		bankerIndex: players.length - 1,
-		order: [],
-		turn: 0,
-		deck: [],
-		phase: "turni",
-		message: "",
-		events: [],
-	});
+		deck: shuffle(createNeapolitanDeck()),
+		pile: [],
+		phase: "puntate",
+		message: banker.isHuman
+			? "Sei il mazziere: dai le carte"
+			: `Mazziere: ${banker.name}. Quanto punti?`,
+	};
 }
 
-/** Nuova mano: mazzo rimescolato, una carta a testa */
-export function dealRound(state: SevenState): SevenState {
-	const deck = shuffle(createNeapolitanDeck());
-	const players = state.players.map((p) => ({
+/** Puntata del giocatore (ignorata se è il mazziere) e distribuzione della prima carta */
+export function placeBet(state: SevenState, amount: number): SevenState {
+	const deck = [...state.deck];
+	const players = state.players.map((p, i) => ({
 		...p,
-		hand: p.status === "eliminato" ? [] : [deck.pop() as NeapolitanCard],
-		status: p.status === "eliminato" ? p.status : ("inGioco" as const),
-		lastDelta: 0,
+		bet: p.isHuman && i !== state.bankerIndex ? amount : p.bet,
+		hand: alive(p) ? [deck.pop() as NeapolitanCard] : [],
 	}));
 	const n = players.length;
 	const order = Array.from(
 		{ length: n },
 		(_, i) => (state.bankerIndex + 1 + i) % n,
-	).filter((i) => players[i].status !== "eliminato");
+	).filter((i) => alive(players[i]));
 	return {
 		...state,
 		players,
@@ -123,7 +179,7 @@ export function dealRound(state: SevenState): SevenState {
 		order,
 		turn: 0,
 		phase: "turni",
-		message: `Mazziere: ${players[state.bankerIndex].name}`,
+		message: "",
 	};
 }
 
@@ -143,8 +199,8 @@ export function drawCard(state: SevenState): SevenState {
 	if (isBust(hand)) {
 		events = isHuman
 			? addEvent(events, "Sballato!", "lose")
-			: addEvent(events, `${name} sballa!`);
-	} else if (isHuman && handScore(hand) === TARGET) {
+			: addEvent(events, `${name} sballa!`, "info", { [name]: "sad" });
+	} else if (handScore(hand) === TARGET && isHuman) {
 		events = addEvent(
 			events,
 			isReale(hand) ? "Sette e mezzo reale!" : "Sette e mezzo!",
@@ -172,8 +228,8 @@ function settleRound(state: SevenState): SevenState {
 	let bankerDelta = 0;
 	let newBanker = state.bankerIndex;
 	const players = state.players.map((p, i) => {
-		if (i === state.bankerIndex || p.status === "eliminato") return p;
-		const delta = settle(p.hand, bankerHand);
+		if (i === state.bankerIndex || !alive(p)) return p;
+		const delta = settle(p.hand, bankerHand, p.bet);
 		bankerDelta -= delta;
 		// Chi fa sette e mezzo reale diventa mazziere
 		if (isReale(p.hand) && !isReale(bankerHand)) newBanker = i;
@@ -188,21 +244,29 @@ function settleRound(state: SevenState): SevenState {
 	const checked = players.map((p) =>
 		p.chips <= 0 ? { ...p, chips: 0, status: "eliminato" as const } : p,
 	);
-	while (checked[newBanker].status === "eliminato") {
+	while (!alive(checked[newBanker])) {
 		newBanker = (newBanker + 1) % checked.length;
 	}
 	const human = checked[0];
-	const cpuAlive = checked.some((p) => !p.isHuman && p.status !== "eliminato");
-	const gameOver = human.status === "eliminato" || !cpuAlive;
+	const cpuAlive = checked.some((p) => !p.isHuman && alive(p));
+	const gameOver = !alive(human) || !cpuAlive;
+
+	const moods: Record<string, Mood> = {};
+	for (const p of checked) {
+		if (!p.isHuman && p.lastDelta !== 0)
+			moods[p.name] = p.lastDelta > 0 ? "happy" : "sad";
+	}
 	let events = state.events;
 	if (human.lastDelta > 0)
-		events = addEvent(events, `Hai vinto! +${human.lastDelta}`, "win");
-	if (human.lastDelta < 0)
-		events = addEvent(events, `Hai perso ${human.lastDelta}`, "lose");
+		events = addEvent(events, `Hai vinto! +${human.lastDelta}`, "win", moods);
+	else if (human.lastDelta < 0)
+		events = addEvent(events, `Hai perso ${human.lastDelta}`, "lose", moods);
+	else events = addEvent(events, "Mano terminata", "info", moods);
 	if (gameOver)
 		events = cpuAlive
 			? addEvent(events, "Partita persa!", "lose")
 			: addEvent(events, "Partita vinta!", "win");
+
 	return {
 		...state,
 		events,
@@ -210,9 +274,19 @@ function settleRound(state: SevenState): SevenState {
 		bankerIndex: newBanker,
 		phase: gameOver ? "finePartita" : "fineMano",
 		message: gameOver
-			? human.status === "eliminato"
-				? "Hai finito le fiches: hai perso!"
-				: "Hai sbancato tutti: hai vinto!"
+			? alive(human)
+				? "Hai sbancato tutti: hai vinto!"
+				: "Hai finito le fiches: hai perso!"
 			: "Mano terminata",
+	};
+}
+
+/** Le carte tornano al mazzo prima della nuova mano */
+export function collectCards(state: SevenState): SevenState {
+	return {
+		...state,
+		pile: state.players.flatMap((p) => p.hand),
+		players: state.players.map((p) => ({ ...p, hand: [] })),
+		phase: "raccolta",
 	};
 }

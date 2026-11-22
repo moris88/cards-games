@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import type { Difficulty } from "../../core/settings";
+import { useSavedGame } from "../../core/useSavedGame";
 import {
 	type BriscolaState,
 	cpuChoose,
@@ -7,11 +9,21 @@ import {
 	resolveTrick,
 } from "./briscolaLogic";
 
-const CPU_DELAY_MS = 800;
+const CPU_DELAY_MS = 900;
 const TRICK_DELAY_MS = 1300;
+const isFinished = (s: BriscolaState) => s.phase === "fine";
 
-export function useBriscola() {
-	const [state, setState] = useState<BriscolaState>(createGame);
+export function useBriscola(
+	cpuName: string,
+	difficulty: Difficulty,
+	resume: boolean,
+) {
+	const [state, setState] = useSavedGame(
+		"briscola",
+		resume,
+		() => createGame(cpuName),
+		isFinished,
+	);
 
 	useEffect(() => {
 		let action: ((s: BriscolaState) => BriscolaState) | null = null;
@@ -20,18 +32,18 @@ export function useBriscola() {
 			action = resolveTrick;
 			delay = TRICK_DELAY_MS;
 		} else if (state.phase === "gioco" && state.turn === 1) {
-			action = (s) => playCard(s, cpuChoose(s));
+			action = (s) => playCard(s, cpuChoose(s, difficulty));
 		}
 		if (!action) return;
 		const run = action;
 		const timer = setTimeout(() => setState(run), delay);
 		return () => clearTimeout(timer);
-	}, [state]);
+	}, [state, difficulty, setState]);
 
 	return {
 		state,
 		canPlay: state.phase === "gioco" && state.turn === 0,
 		play: (cardId: string) => setState((s) => playCard(s, cardId)),
-		restart: () => setState(createGame()),
+		restart: () => setState(createGame(cpuName)),
 	};
 }

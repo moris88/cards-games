@@ -5,6 +5,7 @@ import {
 	shuffle,
 } from "../../core/deck";
 import { addEvent, type GameEvent } from "../../core/gameEvents";
+import type { Difficulty } from "../../core/settings";
 
 /** Punti: Asso 11, Tre 10, Re 4, Cavallo 3, Fante 2, lisci 0 */
 const POINTS: Record<number, number> = { 1: 11, 3: 10, 10: 4, 9: 3, 8: 2 };
@@ -36,9 +37,13 @@ export interface BriscolaState {
 	briscola: NeapolitanCard;
 	trick: PlayedCard[];
 	points: [number, number];
+	/** Carte prese da ciascun giocatore */
+	captured: [NeapolitanCard[], NeapolitanCard[]];
 	turn: number;
 	phase: "gioco" | "presa" | "fine";
 	message: string;
+	/** Nome dell'avversario CPU */
+	cpuName: string;
 	events: GameEvent[];
 }
 
@@ -53,7 +58,7 @@ export function beats(
 	return second.suit === trump;
 }
 
-export function createGame(): BriscolaState {
+export function createGame(cpuName = "CPU"): BriscolaState {
 	const deck = shuffle(createNeapolitanDeck());
 	const hands: [NeapolitanCard[], NeapolitanCard[]] = [
 		deck.splice(-3),
@@ -66,9 +71,11 @@ export function createGame(): BriscolaState {
 		briscola: deck[0],
 		trick: [],
 		points: [0, 0],
+		captured: [[], []],
 		turn: 0,
 		phase: "gioco",
 		message: "Tocca a te",
+		cpuName,
 		events: [],
 	};
 }
@@ -110,13 +117,25 @@ export function resolveTrick(state: BriscolaState): BriscolaState {
 		if (drawn) hands[p].push(drawn);
 	}
 
-	const who = winner === 0 ? "Mano presa da te" : "Mano presa dalla CPU";
+	const who =
+		winner === 0 ? "Mano presa da te" : `Mano presa da ${state.cpuName}`;
 	const finished = hands[0].length === 0 && hands[1].length === 0;
-	let events = addEvent(state.events, `${who} (+${gained})`);
+	const cpuMood = gained < 10 ? "neutral" : winner === 1 ? "happy" : "sad";
+	let events = addEvent(state.events, `${who} (+${gained})`, "info", {
+		[state.cpuName]: cpuMood,
+	});
+	const captured: [NeapolitanCard[], NeapolitanCard[]] = [
+		[...state.captured[0]],
+		[...state.captured[1]],
+	];
+	captured[winner].push(first.card, second.card);
 	if (finished) {
 		const tone =
 			points[0] === points[1] ? "info" : points[0] > points[1] ? "win" : "lose";
-		events = addEvent(events, finalMessage(points), tone);
+		events = addEvent(events, finalMessage(points), tone, {
+			[state.cpuName]:
+				tone === "win" ? "sad" : tone === "lose" ? "happy" : "neutral",
+		});
 	}
 	return {
 		...state,
@@ -124,6 +143,7 @@ export function resolveTrick(state: BriscolaState): BriscolaState {
 		hands,
 		deck,
 		points,
+		captured,
 		trick: [],
 		turn: winner,
 		phase: finished ? "fine" : "gioco",
@@ -138,9 +158,14 @@ function finalMessage([human, cpu]: [number, number]): string {
 		: `Hai perso ${human} a ${cpu}`;
 }
 
-/** Scelta della CPU: semplice euristica */
-export function cpuChoose(state: BriscolaState): string {
+/** Scelta della CPU: Facile a caso, Medio euristica, Difficile conserva i carichi e prende i punti */
+export function cpuChoose(
+	state: BriscolaState,
+	difficulty: Difficulty = "medio",
+): string {
 	const hand = state.hands[1];
+	if (difficulty === "facile")
+		return hand[Math.floor(Math.random() * hand.length)].id;
 	const trump = state.briscola.suit;
 	const cost = (c: NeapolitanCard) =>
 		cardPoints(c) + (c.suit === trump ? 20 : 0) + STRENGTH[c.rank] / 10;
@@ -150,8 +175,11 @@ export function cpuChoose(state: BriscolaState): string {
 		const lead = state.trick[0].card;
 		const winners = cheapest.filter((c) => beats(lead, c, trump));
 		// Prende se la carta in tavola vale punti o se può prendere senza briscola
-		const worthIt = winners.find(
-			(c) => cardPoints(lead) > 0 || c.suit !== trump,
+		const worthIt = winners.find((c) =>
+			difficulty === "difficile"
+				? cardPoints(lead) + cardPoints(c) >= 10 &&
+					(c.suit !== trump || cardPoints(lead) >= 10)
+				: cardPoints(lead) > 0 || c.suit !== trump,
 		);
 		if (worthIt) return worthIt.id;
 	}

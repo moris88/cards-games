@@ -5,6 +5,7 @@ import {
 	drawCard,
 	handScore,
 	isReale,
+	placeBet,
 	settle,
 } from "./setteEMezzoLogic";
 
@@ -30,16 +31,18 @@ describe("sette e mezzo", () => {
 		expect(isReale([c("spade", 8), c("coppe", 7)])).toBe(false);
 	});
 	it("a parità vince il banco, reale paga doppio", () => {
-		expect(settle([c("coppe", 5)], [c("spade", 5)])).toBe(-10);
-		expect(settle([c("coppe", 6)], [c("spade", 5)])).toBe(10);
-		expect(settle([matta, c("coppe", 7)], [c("spade", 5)])).toBe(20);
-		expect(settle([c("coppe", 7), c("spade", 7)], [c("spade", 2)])).toBe(-10);
+		expect(settle([c("coppe", 5)], [c("spade", 5)], 10)).toBe(-10);
+		expect(settle([c("coppe", 6)], [c("spade", 5)], 10)).toBe(10);
+		expect(settle([matta, c("coppe", 7)], [c("spade", 5)], 10)).toBe(20);
+		expect(settle([c("coppe", 7), c("spade", 7)], [c("spade", 2)], 10)).toBe(
+			-10,
+		);
 	});
 });
 
 describe("sette e mezzo eventi", () => {
 	it("annuncia lo sballo del giocatore", () => {
-		let s = createGame(1);
+		let s = placeBet(createGame(["Tu", "A"], "medio"), 10);
 		// Il giocatore umano gioca per primo: gli diamo un 7 e peschiamo un 5
 		s = {
 			...s,
