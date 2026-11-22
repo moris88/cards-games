@@ -9,6 +9,8 @@ export const MAX_CPU: Record<GameId, number> = {
 	scala40: 3,
 	tombola: 5,
 	poker: 5,
+	solitario: 0,
+	freecell: 0,
 };
 
 const GAMES: { id: GameId; title: string; subtitle: string; icon: string }[] = [
@@ -36,6 +38,18 @@ const GAMES: { id: GameId; title: string; subtitle: string; icon: string }[] = [
 		title: "Tombola",
 		subtitle: "Con la smorfia napoletana",
 		icon: "🎱",
+	},
+	{
+		id: "solitario",
+		title: "Solitario",
+		subtitle: "Klondike · carte francesi",
+		icon: "🂡",
+	},
+	{
+		id: "freecell",
+		title: "FreeCell",
+		subtitle: "Partite numerate · carte francesi",
+		icon: "🗃️",
 	},
 ];
 
@@ -74,8 +88,12 @@ export function MainMenu({ settings, onSettings, onPlay }: MainMenuProps) {
 								{g.icon} {g.title}
 							</div>
 							<div className="text-emerald-200">
-								{g.subtitle} · {Math.min(settings.cpuCount, MAX_CPU[g.id])} CPU
-								· {settings.difficulty[g.id]}
+								{g.subtitle}
+								{MAX_CPU[g.id] > 0
+									? ` · ${Math.min(settings.cpuCount, MAX_CPU[g.id])} CPU · ${settings.difficulty[g.id]}`
+									: g.id === "solitario"
+										? ` · gira ${settings.klondikeDraw}`
+										: ""}
 							</div>
 						</div>
 						<div className="flex gap-2">

@@ -1,5 +1,10 @@
 import { useState } from "react";
-import { DIFFICULTIES, type GameId, type Settings } from "../core/settings";
+import {
+	DIFFICULTIES,
+	type GameId,
+	type Settings,
+	SOLO_GAMES,
+} from "../core/settings";
 import { PlayersSettings } from "./PlayersSettings";
 import { RULES } from "./rules";
 
@@ -36,8 +41,28 @@ export function OptionsDialog({
 				<PlayersSettings settings={settings} onChange={onChange} />
 
 				<section className="flex flex-col gap-2">
+					<h3 className="font-semibold">Solitario</h3>
+					<label className="flex items-center justify-between gap-2">
+						Carte da girare dal mazzo
+						<select
+							value={settings.klondikeDraw}
+							onChange={(e) =>
+								onChange({
+									...settings,
+									klondikeDraw: e.target.value === "3" ? 3 : 1,
+								})
+							}
+							className="rounded bg-slate-800 px-2 py-1"
+						>
+							<option value="1">1 carta</option>
+							<option value="3">3 carte</option>
+						</select>
+					</label>
+				</section>
+
+				<section className="flex flex-col gap-2">
 					<h3 className="font-semibold">Difficoltà</h3>
-					{GAME_IDS.map((id) => (
+					{GAME_IDS.filter((id) => !SOLO_GAMES.includes(id)).map((id) => (
 						<label key={id} className="flex items-center justify-between gap-2">
 							{RULES[id].title}
 							<select

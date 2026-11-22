@@ -63,4 +63,27 @@ export const RULES: Record<GameId, GameRules> = {
 			"Chi resta senza fiches è eliminato; vince chi rimane da solo al tavolo.",
 		],
 	},
+	solitario: {
+		title: "Solitario",
+		rules: [
+			"Klondike con mazzo da 52 carte. Sette colonne: la prima ha 1 carta, l'ultima 7; solo l'ultima carta di ogni colonna è scoperta.",
+			"Scopo: portare tutte le carte nelle quattro fondazioni, per seme, dall'Asso al Re.",
+			"Nelle colonne si mettono le carte in ordine decrescente a colori alterni (rosso su nero). Una colonna vuota accetta solo un Re.",
+			"Si possono spostare intere sequenze già ordinate. Spostando una carta, quella coperta sotto si scopre.",
+			"Dal mazzo si girano 1 o 3 carte (si sceglie nelle opzioni); finito il mazzo, il pozzo si rigira.",
+			"Punteggio: +5 dal pozzo a una colonna, +10 in fondazione, +5 per ogni carta scoperta, -15 togliendo dalla fondazione, -100 (gira 1) o -20 (gira 3) rigirando il mazzo.",
+			"Trascina le carte; doppio clic per mandarle in fondazione. Quando tutte le carte sono scoperte compare il tasto Completa.",
+		],
+	},
+	freecell: {
+		title: "FreeCell",
+		rules: [
+			"Tutte le 52 carte sono distribuite scoperte in otto colonne.",
+			"Ci sono quattro celle libere, ognuna può contenere una carta, e quattro fondazioni da riempire per seme dall'Asso al Re.",
+			"Nelle colonne si mettono le carte in ordine decrescente a colori alterni. Una colonna vuota accetta qualsiasi carta.",
+			"Si sposta una carta alla volta; le sequenze si spostano insieme se ci sono abbastanza celle e colonne libere: (celle libere + 1) × 2^(colonne vuote).",
+			"Ogni partita ha un numero da 1 a 1.000.000: lo stesso numero dà sempre la stessa distribuzione.",
+			"Doppio clic: la carta va in fondazione, altrimenti in una cella libera.",
+		],
+	},
 };

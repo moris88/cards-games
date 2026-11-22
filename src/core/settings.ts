@@ -6,9 +6,14 @@ export type GameId =
 	| "briscola"
 	| "scala40"
 	| "tombola"
-	| "poker";
+	| "poker"
+	| "solitario"
+	| "freecell";
 
 export const DIFFICULTIES: Difficulty[] = ["facile", "medio", "difficile"];
+
+/** Giochi senza avversari: la difficoltà non si applica */
+export const SOLO_GAMES: GameId[] = ["solitario", "freecell"];
 export const MAX_OPPONENTS = 5;
 
 export interface Settings {
@@ -16,6 +21,8 @@ export interface Settings {
 	cpuCount: number;
 	playerName: string;
 	cpuNames: string[];
+	/** Solitario: carte girate dal mazzo */
+	klondikeDraw: 1 | 3;
 }
 
 const KEY = "settings";
@@ -27,7 +34,10 @@ export const DEFAULT_SETTINGS: Settings = {
 		scala40: "medio",
 		tombola: "medio",
 		poker: "medio",
+		solitario: "medio",
+		freecell: "medio",
 	},
+	klondikeDraw: 1,
 	cpuCount: 2,
 	playerName: "Tu",
 	cpuNames: ["Gennaro", "Concetta", "Totò", "Nunzia", "Pasquale"],

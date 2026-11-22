@@ -1,4 +1,5 @@
 import { ActionButton } from "../../components/ActionButton";
+import { ChipStack } from "../../components/ChipStack";
 import { DeckPile } from "../../components/DeckPile";
 import { EventOverlay } from "../../components/EventOverlay";
 import { FrenchCardView } from "../../components/FrenchCardView";
@@ -8,7 +9,8 @@ import { Table } from "../../components/Table";
 import type { Difficulty } from "../../core/settings";
 import { BetControls } from "./BetControls";
 import { evaluateHand } from "./handEval";
-import { type PokerPlayer, pot } from "./pokerLogic";
+import { BIG_BLIND, pot, SMALL_BLIND } from "./pokerLogic";
+import { SeatInfo } from "./SeatInfo";
 import { usePoker } from "./usePoker";
 
 interface PokerProps {
@@ -23,13 +25,12 @@ export function Poker({ names, difficulty, resume, onExit }: PokerProps) {
 	const { state } = game;
 	const human = state.players[0];
 	const handOver = state.phase !== "gioco";
-
-	const info = (p: PokerPlayer, i: number) => {
-		const dealer = i === state.dealer ? "🔘 " : "";
-		const status = p.out ? "eliminato" : p.folded ? "ha passato" : p.lastAction;
-		const bet = p.bet > 0 ? ` · puntata ${p.bet}` : "";
-		return `${dealer}fiches ${p.chips}${bet}${status ? ` · ${status}` : ""}`;
-	};
+	// Nel piatto al centro vanno le puntate dei giri già chiusi
+	const streetBets = state.players.reduce((s, p) => s + p.bet, 0);
+	const handName =
+		human.hole.length && state.board.length
+			? evaluateHand([...human.hole, ...state.board]).name
+			: "";
 
 	return (
 		<Table title="Poker Texas Hold'em" onExit={onExit}>
@@ -42,8 +43,8 @@ export function Poker({ names, difficulty, resume, onExit }: PokerProps) {
 						seed={idx + 1}
 						active={!handOver && state.current === idx + 1}
 						events={state.events}
-						info={info(p, idx + 1)}
 					>
+						<SeatInfo state={state} index={idx + 1} />
 						<Hand
 							cards={p.folded ? [] : p.hole}
 							renderCard={(card) => (
@@ -69,9 +70,13 @@ export function Poker({ names, difficulty, resume, onExit }: PokerProps) {
 						))}
 					</div>
 				</div>
-				<p className="rounded-full bg-black/40 px-5 py-1 text-lg font-bold">
-					🪙 Piatto: {pot(state)}
-				</p>
+				<div className="flex items-center gap-4 rounded-full bg-black/40 px-5 py-2">
+					<span className="font-bold">Piatto {pot(state)}</span>
+					<ChipStack amount={pot(state) - streetBets} label="nel piatto" />
+					<span className="text-xs text-emerald-100">
+						Blind {SMALL_BLIND}/{BIG_BLIND}
+					</span>
+				</div>
 				<p className="text-sm">{state.message}</p>
 			</div>
 
@@ -91,11 +96,14 @@ export function Poker({ names, difficulty, resume, onExit }: PokerProps) {
 				{state.phase === "finePartita" && (
 					<ActionButton onClick={game.restart}>Nuova partita</ActionButton>
 				)}
-				<Hand
-					cards={human.hole}
-					label={`${human.name} · ${info(human, 0)}${human.hole.length && state.board.length ? ` · ${evaluateHand([...human.hole, ...state.board]).name}` : ""}`}
-					renderCard={(card) => <FrenchCardView card={card} />}
-				/>
+				<div className="flex items-end gap-6">
+					<Hand
+						cards={human.hole}
+						label={`${human.name} · fiches ${human.chips}${handName ? ` · ${handName}` : ""}`}
+						renderCard={(card) => <FrenchCardView card={card} />}
+					/>
+					<SeatInfo state={state} index={0} />
+				</div>
 			</div>
 		</Table>
 	);

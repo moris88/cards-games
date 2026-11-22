@@ -1,6 +1,7 @@
 import { createFrenchDeck, type FrenchCard, shuffle } from "../../core/deck";
 import { addEvent, type GameEvent, type Mood } from "../../core/gameEvents";
 import { evaluateHand } from "./handEval";
+import { blindSeats, nextIndex } from "./pokerSeats";
 
 export const STARTING_CHIPS = 1000;
 export const SMALL_BLIND = 5;
@@ -34,6 +35,8 @@ export interface PokerState {
 	deck: FrenchCard[];
 	board: FrenchCard[];
 	dealer: number;
+	smallBlind: number;
+	bigBlind: number;
 	current: number;
 	street: Street;
 	currentBet: number;
@@ -49,18 +52,6 @@ export const pot = (s: PokerState) =>
 	s.players.reduce((sum, p) => sum + p.totalBet, 0);
 const inHand = (p: PokerPlayer) => !p.out && !p.folded;
 const canAct = (p: PokerPlayer) => inHand(p) && p.chips > 0;
-
-function nextIndex(
-	players: PokerPlayer[],
-	from: number,
-	ok: (p: PokerPlayer) => boolean,
-) {
-	for (let step = 1; step <= players.length; step++) {
-		const i = (from + step) % players.length;
-		if (ok(players[i])) return i;
-	}
-	return from;
-}
 
 export function createGame(names: string[]): PokerState {
 	const players: PokerPlayer[] = names
@@ -81,6 +72,8 @@ export function createGame(names: string[]): PokerState {
 		deck: [],
 		board: [],
 		dealer: 0,
+		smallBlind: 0,
+		bigBlind: 0,
 		current: 0,
 		street: "preflop",
 		currentBet: 0,
@@ -113,12 +106,8 @@ export function startHand(state: PokerState): PokerState {
 		acted: false,
 		lastAction: "",
 	}));
-	const alive = (p: PokerPlayer) => !p.out;
-	const dealer = nextIndex(players, state.dealer, alive);
-	const headsUp = players.filter(alive).length === 2;
-	// Testa a testa il mazziere mette lo small blind
-	const sb = headsUp ? dealer : nextIndex(players, dealer, alive);
-	const bb = nextIndex(players, sb, alive);
+	const dealer = nextIndex(players, state.dealer, (p) => !p.out);
+	const { smallBlind: sb, bigBlind: bb } = blindSeats(players, dealer);
 	players = players.map((p, i) =>
 		i === sb
 			? { ...pay(p, SMALL_BLIND), lastAction: "small blind" }
@@ -132,6 +121,8 @@ export function startHand(state: PokerState): PokerState {
 		deck,
 		board: [],
 		dealer,
+		smallBlind: sb,
+		bigBlind: bb,
 		street: "preflop",
 		currentBet: BIG_BLIND,
 		minRaise: BIG_BLIND,
