@@ -7,6 +7,7 @@ export type GameId =
 	| "scala40"
 	| "tombola"
 	| "poker"
+	| "scopa"
 	| "solitario"
 	| "freecell";
 
@@ -23,6 +24,8 @@ export interface Settings {
 	cpuNames: string[];
 	/** Solitario: carte girate dal mazzo */
 	klondikeDraw: 1 | 3;
+	/** Scopa: punti per vincere la partita */
+	scopaTarget: 11 | 16 | 21;
 }
 
 const KEY = "settings";
@@ -34,10 +37,12 @@ export const DEFAULT_SETTINGS: Settings = {
 		scala40: "medio",
 		tombola: "medio",
 		poker: "medio",
+		scopa: "medio",
 		solitario: "medio",
 		freecell: "medio",
 	},
 	klondikeDraw: 1,
+	scopaTarget: 11,
 	cpuCount: 2,
 	playerName: "Tu",
 	cpuNames: ["Gennaro", "Concetta", "Totò", "Nunzia", "Pasquale"],

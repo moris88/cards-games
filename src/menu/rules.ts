@@ -63,6 +63,20 @@ export const RULES: Record<GameId, GameRules> = {
 			"Chi resta senza fiches è eliminato; vince chi rimane da solo al tavolo.",
 		],
 	},
+	scopa: {
+		title: "Scopa",
+		rules: [
+			"Si gioca con 40 carte napoletane: 1 contro 1, in tre, oppure 2 contro 2 a coppie (con 3 avversari il compagno è quello di fronte).",
+			"Si danno 3 carte a testa e 4 scoperte in tavola (se ci sono 3 o più Re si rimescola). Finite le carte in mano se ne danno altre 3.",
+			"Valori di presa: dall'Asso (1) al 7, Fante 8, Cavallo 9, Re 10.",
+			"Si prende una carta dello stesso valore o più carte la cui somma è uguale. Se c'è una carta uguale bisogna prendere quella.",
+			"Se non si può prendere, la carta resta in tavola. Chi svuota la tavola fa scopa (1 punto), tranne con l'ultima carta della smazzata.",
+			"A fine smazzata le carte rimaste vanno a chi ha preso per ultimo.",
+			"Punti: carte (più di 20), denari (più di 5), settebello, primiera e uno per ogni scopa. A parità il punto non si assegna.",
+			"Primiera: la migliore carta per seme, con 7 = 21, 6 = 18, Asso = 16, 5 = 15, 4 = 14, 3 = 13, 2 = 12, figure = 10.",
+			"Vince chi arriva per primo a 11, 16 o 21 punti (si sceglie nelle opzioni); a pari merito si gioca un'altra smazzata.",
+		],
+	},
 	solitario: {
 		title: "Solitario",
 		rules: [

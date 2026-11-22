@@ -10,6 +10,7 @@ import {
 import { Briscola } from "./games/briscola/Briscola";
 import { Poker } from "./games/poker/Poker";
 import { Scala40 } from "./games/scala40/Scala40";
+import { Scopa } from "./games/scopa/Scopa";
 import { SetteEMezzo } from "./games/setteEMezzo/SetteEMezzo";
 import { FreeCell } from "./games/solitaire/FreeCell";
 import { Klondike } from "./games/solitaire/Klondike";
@@ -54,6 +55,7 @@ export default function App() {
 			{game === "scala40" && <Scala40 {...props} />}
 			{game === "tombola" && <Tombola {...props} />}
 			{game === "poker" && <Poker {...props} />}
+			{game === "scopa" && <Scopa {...props} target={settings.scopaTarget} />}
 			{game === "solitario" && (
 				<Klondike
 					drawCount={settings.klondikeDraw}

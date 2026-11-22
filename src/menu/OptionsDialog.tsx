@@ -41,9 +41,9 @@ export function OptionsDialog({
 				<PlayersSettings settings={settings} onChange={onChange} />
 
 				<section className="flex flex-col gap-2">
-					<h3 className="font-semibold">Solitario</h3>
+					<h3 className="font-semibold">Regole di gioco</h3>
 					<label className="flex items-center justify-between gap-2">
-						Carte da girare dal mazzo
+						Solitario: carte da girare dal mazzo
 						<select
 							value={settings.klondikeDraw}
 							onChange={(e) =>
@@ -56,6 +56,24 @@ export function OptionsDialog({
 						>
 							<option value="1">1 carta</option>
 							<option value="3">3 carte</option>
+						</select>
+					</label>
+					<label className="flex items-center justify-between gap-2">
+						Scopa: punti per vincere
+						<select
+							value={settings.scopaTarget}
+							onChange={(e) => {
+								const value = Number(e.target.value);
+								onChange({
+									...settings,
+									scopaTarget: value === 16 ? 16 : value === 21 ? 21 : 11,
+								});
+							}}
+							className="rounded bg-slate-800 px-2 py-1"
+						>
+							<option value="11">11 punti</option>
+							<option value="16">16 punti</option>
+							<option value="21">21 punti</option>
 						</select>
 					</label>
 				</section>

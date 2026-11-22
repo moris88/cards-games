@@ -9,6 +9,7 @@ export const MAX_CPU: Record<GameId, number> = {
 	scala40: 3,
 	tombola: 5,
 	poker: 5,
+	scopa: 3,
 	solitario: 0,
 	freecell: 0,
 };
@@ -27,6 +28,12 @@ const GAMES: { id: GameId; title: string; subtitle: string; icon: string }[] = [
 		icon: "🃏",
 	},
 	{ id: "scala40", title: "Scala 40", subtitle: "Carte francesi", icon: "♠️" },
+	{
+		id: "scopa",
+		title: "Scopa",
+		subtitle: "Carte napoletane · anche a coppie",
+		icon: "🧹",
+	},
 	{
 		id: "poker",
 		title: "Poker Texas Hold'em",
