@@ -3,11 +3,14 @@ import { useState } from "react";
 import {
 	type GameId,
 	loadSettings,
+	normalizeSettings,
 	playerNames,
 	type Settings,
 	saveSettings,
 } from "./core/settings";
 import { Briscola } from "./games/briscola/Briscola";
+import { ClockSolitaire } from "./games/napoletaneSolitaire/ClockSolitaire";
+import { Pyramid } from "./games/napoletaneSolitaire/Pyramid";
 import { Poker } from "./games/poker/Poker";
 import { Scala40 } from "./games/scala40/Scala40";
 import { Scopa } from "./games/scopa/Scopa";
@@ -23,12 +26,15 @@ interface Session {
 }
 
 export default function App() {
-	const [settings, setSettings] = useState<Settings>(loadSettings);
+	const [storedSettings, setSettings] = useState<Settings>(loadSettings);
 	const [session, setSession] = useState<Session | null>(null);
+	// Sempre completate: evita valori mancanti da impostazioni di versioni precedenti
+	const settings = normalizeSettings(storedSettings);
 
 	const updateSettings = (next: Settings) => {
-		setSettings(next);
-		saveSettings(next);
+		const normalized = normalizeSettings(next);
+		setSettings(normalized);
+		saveSettings(normalized);
 	};
 
 	if (!session)
@@ -62,6 +68,10 @@ export default function App() {
 					resume={resume}
 					onExit={props.onExit}
 				/>
+			)}
+			{game === "piramide" && <Pyramid resume={resume} onExit={props.onExit} />}
+			{game === "orologio" && (
+				<ClockSolitaire resume={resume} onExit={props.onExit} />
 			)}
 			{game === "freecell" && (
 				<FreeCell resume={resume} onExit={props.onExit} />

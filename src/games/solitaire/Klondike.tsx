@@ -3,7 +3,7 @@ import { EventOverlay } from "../../components/EventOverlay";
 import { FrenchCardView } from "../../components/FrenchCardView";
 import { Table } from "../../components/Table";
 import { DraggableCard } from "./DraggableCard";
-import type { DrawCount } from "./klondikeLogic";
+import { type DrawCount, drawCountOf } from "./klondikeLogic";
 import { PileSlot } from "./PileSlot";
 import { SolitaireBar } from "./SolitaireBar";
 import { dropId } from "./solitaireRules";
@@ -22,10 +22,10 @@ export function Klondike({ drawCount, resume, onExit }: KlondikeProps) {
 	const game = useKlondike(drawCount, resume);
 	const { state } = game;
 	// Con "gira 3" si vedono le ultime tre carte del pozzo a ventaglio
-	const visibleWaste = state.waste.slice(-state.drawCount);
+	const visibleWaste = state.waste.slice(-drawCountOf(state));
 
 	return (
-		<Table title={`Solitario · gira ${state.drawCount}`} onExit={onExit}>
+		<Table title={`Solitario · gira ${drawCountOf(state)}`} onExit={onExit}>
 			<EventOverlay events={state.events} />
 			<SolitaireBar
 				elapsed={state.elapsed}

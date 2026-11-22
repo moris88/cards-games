@@ -9,12 +9,19 @@ export type GameId =
 	| "poker"
 	| "scopa"
 	| "solitario"
-	| "freecell";
+	| "freecell"
+	| "piramide"
+	| "orologio";
 
 export const DIFFICULTIES: Difficulty[] = ["facile", "medio", "difficile"];
 
 /** Giochi senza avversari: la difficoltà non si applica */
-export const SOLO_GAMES: GameId[] = ["solitario", "freecell"];
+export const SOLO_GAMES: GameId[] = [
+	"solitario",
+	"freecell",
+	"piramide",
+	"orologio",
+];
 export const MAX_OPPONENTS = 5;
 
 export interface Settings {
@@ -40,6 +47,8 @@ export const DEFAULT_SETTINGS: Settings = {
 		scopa: "medio",
 		solitario: "medio",
 		freecell: "medio",
+		piramide: "medio",
+		orologio: "medio",
 	},
 	klondikeDraw: 1,
 	scopaTarget: 11,
@@ -48,14 +57,31 @@ export const DEFAULT_SETTINGS: Settings = {
 	cpuNames: ["Gennaro", "Concetta", "Totò", "Nunzia", "Pasquale"],
 };
 
-export function loadSettings(): Settings {
-	const saved = loadJson<Partial<Settings>>(KEY);
+/**
+ * Completa le impostazioni con i valori predefiniti: quelle salvate da
+ * versioni precedenti possono non avere le opzioni aggiunte dopo.
+ */
+export function normalizeSettings(saved: Partial<Settings> | null): Settings {
+	const merged = { ...DEFAULT_SETTINGS, ...saved };
 	return {
-		...DEFAULT_SETTINGS,
-		...saved,
+		...merged,
 		difficulty: { ...DEFAULT_SETTINGS.difficulty, ...saved?.difficulty },
+		klondikeDraw: merged.klondikeDraw === 3 ? 3 : 1,
+		scopaTarget: [11, 16, 21].includes(merged.scopaTarget)
+			? merged.scopaTarget
+			: DEFAULT_SETTINGS.scopaTarget,
+		cpuCount: Math.min(
+			Math.max(Number(merged.cpuCount) || 1, 1),
+			MAX_OPPONENTS,
+		),
+		cpuNames: DEFAULT_SETTINGS.cpuNames.map(
+			(name, i) => merged.cpuNames?.[i] ?? name,
+		),
 	};
 }
+
+export const loadSettings = (): Settings =>
+	normalizeSettings(loadJson<Partial<Settings>>(KEY));
 
 export const saveSettings = (settings: Settings) => saveJson(KEY, settings);
 

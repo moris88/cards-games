@@ -41,6 +41,10 @@ const POINTS = {
 	recycle: { 1: -100, 3: -20 },
 } as const;
 
+/** Carte da girare, con 1 come valore di sicurezza per salvataggi incompleti */
+export const drawCountOf = (s: KlondikeState): DrawCount =>
+	s.drawCount === 3 ? 3 : 1;
+
 export function createKlondike(drawCount: DrawCount): KlondikeState {
 	const deck = shuffle(createFrenchDeck());
 	const tableau = Array.from({ length: 7 }, (_, i) => deck.splice(-(i + 1)));
@@ -52,7 +56,7 @@ export function createKlondike(drawCount: DrawCount): KlondikeState {
 		faceDown: tableau.map((col) => col.length - 1),
 		score: 0,
 		moves: 0,
-		drawCount,
+		drawCount: drawCount === 3 ? 3 : 1,
 		elapsed: 0,
 		won: false,
 		history: [],
@@ -94,10 +98,10 @@ export function drawStock(s: KlondikeState): KlondikeState {
 			...s,
 			stock: [...s.waste].reverse(),
 			waste: [],
-			score: s.score + POINTS.recycle[s.drawCount],
+			score: s.score + POINTS.recycle[drawCountOf(s)],
 		});
 	}
-	const drawn = s.stock.slice(-s.drawCount).reverse();
+	const drawn = s.stock.slice(-drawCountOf(s)).reverse();
 	return commit(s, {
 		...s,
 		stock: s.stock.slice(0, -drawn.length),

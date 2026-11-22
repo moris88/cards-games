@@ -89,6 +89,27 @@ export const RULES: Record<GameId, GameRules> = {
 			"Trascina le carte; doppio clic per mandarle in fondazione. Quando tutte le carte sono scoperte compare il tasto Completa.",
 		],
 	},
+	piramide: {
+		title: "Piramide",
+		rules: [
+			"Si gioca da soli con 40 carte napoletane: 21 carte formano una piramide di 6 file, le altre 19 restano nel mazzo.",
+			"Valori: dall'Asso (1) al 7, Fante 8, Cavallo 9, Re 10.",
+			"Si eliminano coppie di carte che sommano 10 (es. Asso + Cavallo, 3 + 7, 5 + 5). Il Re vale 10 e si elimina da solo.",
+			"Si possono usare solo le carte libere, cioè non coperte da carte della fila di sotto, e la carta in cima al pozzo.",
+			"Dal mazzo si gira una carta alla volta sul pozzo. Il mazzo si passa una volta sola: non si rigira.",
+			"Si vince liberando tutta la piramide fino alla cima.",
+		],
+	},
+	orologio: {
+		title: "L'Orologio",
+		rules: [
+			"Solitario tradizionale con 40 carte napoletane, distribuite in 10 mazzetti coperti da 4: nove attorno al quadrante (dall'Asso al Cavallo) e i Re al centro.",
+			"Si gira la prima carta del mazzetto centrale e la si trascina, scoperta, sotto il mazzetto del suo valore.",
+			"Poi si gira la prima carta coperta di quel mazzetto e si continua allo stesso modo.",
+			"Quando esce il quarto Re il gioco si ferma: si vince se a quel punto tutte le carte sono scoperte.",
+			"È un solitario di fortuna: la carta lasciata sul mazzetto sbagliato torna indietro.",
+		],
+	},
 	freecell: {
 		title: "FreeCell",
 		rules: [

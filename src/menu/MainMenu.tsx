@@ -12,6 +12,8 @@ export const MAX_CPU: Record<GameId, number> = {
 	scopa: 3,
 	solitario: 0,
 	freecell: 0,
+	piramide: 0,
+	orologio: 0,
 };
 
 const GAMES: { id: GameId; title: string; subtitle: string; icon: string }[] = [
@@ -58,7 +60,27 @@ const GAMES: { id: GameId; title: string; subtitle: string; icon: string }[] = [
 		subtitle: "Partite numerate · carte francesi",
 		icon: "🗃️",
 	},
+	{
+		id: "piramide",
+		title: "Piramide",
+		subtitle: "Coppie che fanno 10 · carte napoletane",
+		icon: "🔺",
+	},
+	{
+		id: "orologio",
+		title: "L'Orologio",
+		subtitle: "Solitario tradizionale · carte napoletane",
+		icon: "🕰️",
+	},
 ];
+
+/** Modalità di gioco mostrata sulla scheda: da solo o contro avversari */
+function modeLabel(id: GameId, cpuCount: number): string {
+	const opponents = Math.min(cpuCount, MAX_CPU[id]);
+	if (opponents === 0) return "👤 Da solo";
+	if (id === "scopa" && opponents === 3) return "👥 A coppie, 2 contro 2";
+	return `👥 Contro ${opponents} ${opponents === 1 ? "avversario" : "avversari"}`;
+}
 
 interface MainMenuProps {
 	settings: Settings;
@@ -94,13 +116,21 @@ export function MainMenu({ settings, onSettings, onPlay }: MainMenuProps) {
 							<div className="text-2xl font-bold">
 								{g.icon} {g.title}
 							</div>
-							<div className="text-emerald-200">
-								{g.subtitle}
-								{MAX_CPU[g.id] > 0
-									? ` · ${Math.min(settings.cpuCount, MAX_CPU[g.id])} CPU · ${settings.difficulty[g.id]}`
-									: g.id === "solitario"
-										? ` · gira ${settings.klondikeDraw}`
-										: ""}
+							<div className="text-emerald-200">{g.subtitle}</div>
+							<div className="mt-1 flex flex-wrap gap-1 text-xs">
+								<span className="rounded-full bg-black/40 px-2 py-0.5 font-semibold">
+									{modeLabel(g.id, settings.cpuCount)}
+								</span>
+								{MAX_CPU[g.id] > 0 && (
+									<span className="rounded-full bg-black/30 px-2 py-0.5 capitalize">
+										{settings.difficulty[g.id]}
+									</span>
+								)}
+								{g.id === "solitario" && (
+									<span className="rounded-full bg-black/30 px-2 py-0.5">
+										gira {settings.klondikeDraw}
+									</span>
+								)}
 							</div>
 						</div>
 						<div className="flex gap-2">
