@@ -74,3 +74,36 @@ describe("partita tra CPU", () => {
 		}
 	});
 });
+
+describe("scopone", () => {
+	it("tutte le carte in mano e tavola vuota, in 2 e in 4", () => {
+		for (const [players, perHand] of [
+			[2, 20],
+			[4, 10],
+		]) {
+			const s = createGame(
+				Array.from({ length: players }, (_, i) => `G${i}`),
+				11,
+				"scopone",
+			);
+			expect(s.table).toHaveLength(0);
+			expect(s.deck).toHaveLength(0);
+			for (const p of s.players) expect(p.hand).toHaveLength(perHand);
+		}
+	});
+	it("una smazzata completa assegna tutte le 40 carte", () => {
+		let s = createGame(["A", "B", "C", "D"], 11, "scopone");
+		for (
+			let i = 0;
+			i < 200 && s.phase !== "fineSmazzata" && s.phase !== "finePartita";
+			i++
+		) {
+			if (s.phase === "presa") s = resolvePlay(s);
+			else {
+				const move = chooseMove(s, "medio");
+				s = playCard(s, move.cardId, move.take);
+			}
+		}
+		expect(s.sides.reduce((t, side) => t + side.captured.length, 0)).toBe(40);
+	});
+});

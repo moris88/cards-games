@@ -47,8 +47,15 @@ export default function App() {
 		);
 
 	const { game, resume } = session;
+	// Lo Scopone si gioca solo in 2 o in 4
+	const opponents =
+		game === "scopone"
+			? settings.cpuCount >= 2
+				? 3
+				: 1
+			: Math.min(settings.cpuCount, MAX_CPU[game]);
 	const props = {
-		names: playerNames(settings, Math.min(settings.cpuCount, MAX_CPU[game])),
+		names: playerNames(settings, opponents),
 		difficulty: settings.difficulty[game],
 		resume,
 		onExit: () => setSession(null),
@@ -61,7 +68,12 @@ export default function App() {
 			{game === "scala40" && <Scala40 {...props} />}
 			{game === "tombola" && <Tombola {...props} />}
 			{game === "poker" && <Poker {...props} />}
-			{game === "scopa" && <Scopa {...props} target={settings.scopaTarget} />}
+			{game === "scopa" && (
+				<Scopa {...props} target={settings.scopaTarget} variant="scopa" />
+			)}
+			{game === "scopone" && (
+				<Scopa {...props} target={settings.scopaTarget} variant="scopone" />
+			)}
 			{game === "solitario" && (
 				<Klondike
 					drawCount={settings.klondikeDraw}

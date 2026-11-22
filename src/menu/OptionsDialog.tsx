@@ -59,7 +59,7 @@ export function OptionsDialog({
 						</select>
 					</label>
 					<label className="flex items-center justify-between gap-2">
-						Scopa: punti per vincere
+						Scopa e Scopone: punti per vincere
 						<select
 							value={settings.scopaTarget}
 							onChange={(e) => {

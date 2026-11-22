@@ -10,6 +10,7 @@ export const MAX_CPU: Record<GameId, number> = {
 	tombola: 5,
 	poker: 5,
 	scopa: 3,
+	scopone: 3,
 	solitario: 0,
 	freecell: 0,
 	piramide: 0,
@@ -34,6 +35,12 @@ const GAMES: { id: GameId; title: string; subtitle: string; icon: string }[] = [
 		id: "scopa",
 		title: "Scopa",
 		subtitle: "Carte napoletane · anche a coppie",
+		icon: "🧹",
+	},
+	{
+		id: "scopone",
+		title: "Scopone",
+		subtitle: "Tutte le carte in mano · 2 o 4 giocatori",
 		icon: "🧹",
 	},
 	{
@@ -78,6 +85,10 @@ const GAMES: { id: GameId; title: string; subtitle: string; icon: string }[] = [
 function modeLabel(id: GameId, cpuCount: number): string {
 	const opponents = Math.min(cpuCount, MAX_CPU[id]);
 	if (opponents === 0) return "👤 Da solo";
+	if (id === "scopone")
+		return opponents >= 2
+			? "👥 A coppie, 2 contro 2"
+			: "👥 Contro 1 avversario";
 	if (id === "scopa" && opponents === 3) return "👥 A coppie, 2 contro 2";
 	return `👥 Contro ${opponents} ${opponents === 1 ? "avversario" : "avversari"}`;
 }

@@ -8,6 +8,7 @@ export type GameId =
 	| "tombola"
 	| "poker"
 	| "scopa"
+	| "scopone"
 	| "solitario"
 	| "freecell"
 	| "piramide"
@@ -45,6 +46,7 @@ export const DEFAULT_SETTINGS: Settings = {
 		tombola: "medio",
 		poker: "medio",
 		scopa: "medio",
+		scopone: "medio",
 		solitario: "medio",
 		freecell: "medio",
 		piramide: "medio",

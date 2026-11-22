@@ -10,6 +10,7 @@ import {
 	resolvePlay,
 	type ScopaState,
 	type ScopaTarget,
+	type ScopaVariant,
 } from "./scopaLogic";
 import { captureOptions } from "./scopaRules";
 
@@ -20,13 +21,14 @@ const isFinished = (s: ScopaState) => s.phase === "finePartita";
 export function useScopa(
 	names: string[],
 	target: ScopaTarget,
+	variant: ScopaVariant,
 	difficulty: Difficulty,
 	resume: boolean,
 ) {
 	const [state, setState] = useSavedGame(
-		"scopa",
+		variant,
 		resume,
-		() => createGame(names, target),
+		() => createGame(names, target, variant),
 		isFinished,
 	);
 	/** Carta scelta dal giocatore quando ha più prese possibili */
@@ -73,6 +75,6 @@ export function useScopa(
 		},
 		cancelChoice: () => setChoosing(null),
 		nextRound: () => setState(dealRound),
-		restart: () => setState(createGame(names, target)),
+		restart: () => setState(createGame(names, target, variant)),
 	};
 }

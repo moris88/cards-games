@@ -9,12 +9,13 @@ import type { Difficulty } from "../../core/settings";
 import { CapturePile } from "../briscola/CapturePile";
 import { CaptureChooser } from "./CaptureChooser";
 import { RoundSummary } from "./RoundSummary";
-import { type ScopaTarget, sideName } from "./scopaLogic";
+import { type ScopaTarget, type ScopaVariant, sideName } from "./scopaLogic";
 import { useScopa } from "./useScopa";
 
 interface ScopaProps {
 	names: string[];
 	target: ScopaTarget;
+	variant: ScopaVariant;
 	difficulty: Difficulty;
 	resume: boolean;
 	onExit: () => void;
@@ -23,11 +24,12 @@ interface ScopaProps {
 export function Scopa({
 	names,
 	target,
+	variant,
 	difficulty,
 	resume,
 	onExit,
 }: ScopaProps) {
-	const game = useScopa(names, target, difficulty, resume);
+	const game = useScopa(names, target, variant, difficulty, resume);
 	const { state } = game;
 	const human = state.players[0];
 	const pending = state.pending;
@@ -36,7 +38,10 @@ export function Scopa({
 		state.phase === "fineSmazzata" || state.phase === "finePartita";
 
 	return (
-		<Table title={`Scopa · a ${state.target} punti`} onExit={onExit}>
+		<Table
+			title={`${variant === "scopone" ? "Scopone" : "Scopa"} · a ${state.target} punti`}
+			onExit={onExit}
+		>
 			<EventOverlay events={state.events} />
 			<div className="flex flex-wrap items-start justify-center gap-4">
 				{state.players.slice(1).map((p, idx) => (

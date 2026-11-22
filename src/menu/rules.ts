@@ -77,6 +77,17 @@ export const RULES: Record<GameId, GameRules> = {
 			"Vince chi arriva per primo a 11, 16 o 21 punti (si sceglie nelle opzioni); a pari merito si gioca un'altra smazzata.",
 		],
 	},
+	scopone: {
+		title: "Scopone",
+		rules: [
+			"Scopone scientifico: tutte le 40 carte vengono distribuite subito e la tavola parte vuota.",
+			"In 4 si gioca a coppie (il compagno è quello di fronte) con 10 carte a testa; in 2 si gioca testa a testa con 20 carte a testa.",
+			"Con 1 avversario nelle opzioni si gioca in 2, con 2 o più avversari si gioca in 4.",
+			"Le prese seguono le regole della Scopa: carta dello stesso valore (obbligatoria se c'è) oppure somma. Fante 8, Cavallo 9, Re 10.",
+			"Chi svuota la tavola fa scopa, tranne con l'ultima carta della smazzata; le carte rimaste vanno a chi ha preso per ultimo.",
+			"Punti come nella Scopa: carte, denari, settebello, primiera e scope. Si vince a 11, 16 o 21 punti (opzione della Scopa).",
+		],
+	},
 	solitario: {
 		title: "Solitario",
 		rules: [

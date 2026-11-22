@@ -12,6 +12,8 @@ import {
 } from "./scopaRules";
 
 export type ScopaTarget = 11 | 16 | 21;
+/** Scopa: 3 carte a testa e 4 in tavola. Scopone: tutte le carte in mano, tavola vuota */
+export type ScopaVariant = "scopa" | "scopone";
 const HAND_SIZE = 3;
 
 export interface ScopaPlayer {
@@ -47,6 +49,7 @@ export interface ScopaState {
 	phase: "gioco" | "presa" | "fineSmazzata" | "finePartita";
 	summary: SideScore[] | null;
 	target: ScopaTarget;
+	variant: ScopaVariant;
 	message: string;
 	events: GameEvent[];
 }
@@ -59,7 +62,11 @@ export const sideName = (s: ScopaState, side: number) =>
 		.join(" e ");
 const humanSide = (s: ScopaState) => s.players[0].side;
 
-export function createGame(names: string[], target: ScopaTarget): ScopaState {
+export function createGame(
+	names: string[],
+	target: ScopaTarget,
+	variant: ScopaVariant = "scopa",
+): ScopaState {
 	const sides = sideCount(names.length);
 	return dealRound({
 		players: names.map((name, i) => ({
@@ -82,6 +89,7 @@ export function createGame(names: string[], target: ScopaTarget): ScopaState {
 		phase: "gioco",
 		summary: null,
 		target,
+		variant,
 		message: "",
 		events: [],
 	});
@@ -90,19 +98,39 @@ export function createGame(names: string[], target: ScopaTarget): ScopaState {
 const dealHands = (players: ScopaPlayer[], deck: NeapolitanCard[]) =>
 	players.map((p) => ({ ...p, hand: deck.splice(-HAND_SIZE) }));
 
-/** Nuova smazzata: 4 carte in tavola (si rimescola se ci sono 3 o più Re) */
-export function dealRound(state: ScopaState): ScopaState {
+/** Scopone: tutte le 40 carte divise tra i giocatori, tavola vuota */
+function dealScopone(players: ScopaPlayer[]) {
+	const deck = shuffle(createNeapolitanDeck());
+	const perPlayer = deck.length / players.length;
+	return {
+		players: players.map((p) => ({ ...p, hand: deck.splice(-perPlayer) })),
+		table: [] as NeapolitanCard[],
+		deck,
+	};
+}
+
+/** Scopa: 4 carte in tavola (si rimescola se ci sono 3 o più Re) e 3 a testa */
+function dealScopa(players: ScopaPlayer[]) {
 	let deck: NeapolitanCard[];
 	let table: NeapolitanCard[];
 	do {
 		deck = shuffle(createNeapolitanDeck());
 		table = deck.splice(-4);
 	} while (table.filter((c) => c.rank === 10).length >= 3);
+	return { players: dealHands(players, deck), table, deck };
+}
+
+/** Nuova smazzata secondo la variante */
+export function dealRound(state: ScopaState): ScopaState {
+	const { players, table, deck } =
+		state.variant === "scopone"
+			? dealScopone(state.players)
+			: dealScopa(state.players);
 	const dealer = (state.dealer + 1) % state.players.length;
 	const current = (dealer + 1) % state.players.length;
 	return {
 		...state,
-		players: dealHands(state.players, deck),
+		players,
 		sides: state.sides.map((s) => ({ ...s, captured: [], scope: 0 })),
 		table,
 		deck,

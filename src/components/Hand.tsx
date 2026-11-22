@@ -15,7 +15,14 @@ export function Hand<T extends { id: string }>({
 	const middle = (cards.length - 1) / 2;
 	const spread = Math.min(6, 40 / Math.max(cards.length, 1));
 	// Più carte ci sono, più si sovrappongono: così il ventaglio sta anche sul telefono
-	const overlap = cards.length > 10 ? 0.3 : cards.length > 6 ? 0.22 : 0.15;
+	const overlap =
+		cards.length > 15
+			? 0.38
+			: cards.length > 10
+				? 0.3
+				: cards.length > 6
+					? 0.22
+					: 0.15;
 
 	return (
 		<div className="flex max-w-full flex-col items-center gap-1 sm:gap-2">
