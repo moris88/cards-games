@@ -39,6 +39,15 @@ export function BetControls({
 			)}
 			{canRaise && (
 				<>
+					<button
+						type="button"
+						onClick={() => setRaiseTo(Math.max(minTo, value - 5))}
+						disabled={value <= minTo}
+						className="rounded bg-slate-700 px-2 py-1 text-xs disabled:opacity-40"
+						aria-label="Diminuisci la puntata"
+					>
+						−
+					</button>
 					<input
 						type="range"
 						min={minTo}
@@ -48,6 +57,15 @@ export function BetControls({
 						onChange={(e) => setRaiseTo(Number(e.target.value))}
 						aria-label="Importo del rilancio"
 					/>
+					<button
+						type="button"
+						onClick={() => setRaiseTo(Math.min(maxTo, value + 5))}
+						disabled={value >= maxTo}
+						className="rounded bg-slate-700 px-2 py-1 text-xs disabled:opacity-40"
+						aria-label="Aumenta la puntata"
+					>
+						+
+					</button>
 					<button
 						type="button"
 						onClick={() => setRaiseTo(currentBet + Math.round(pot / 2 / 5) * 5)}
