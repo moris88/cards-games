@@ -105,6 +105,17 @@ export function MainMenu({ settings, onSettings, onPlay }: MainMenuProps) {
 	return (
 		<div className="flex min-h-screen flex-col items-center justify-center gap-8 p-6">
 			<h1 className="text-4xl font-bold">🃏 Giochi di carte</h1>
+			<p className="-mt-4 text-sm text-emerald-100">
+				di{" "}
+				<a
+					href="https://www.mauriziotolomeo.it"
+					target="_blank"
+					rel="noopener noreferrer"
+					className="underline hover:text-white"
+				>
+					Maurizio Tolomeo
+				</a>
+			</p>
 			<div className="flex flex-wrap items-center justify-center gap-4">
 				<span className="text-emerald-100">
 					{settings.playerName || "Tu"} contro {settings.cpuCount} avversari
