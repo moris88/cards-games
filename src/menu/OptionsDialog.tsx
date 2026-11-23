@@ -76,6 +76,16 @@ export function OptionsDialog({
 							<option value="21">21 punti</option>
 						</select>
 					</label>
+					<label className="flex items-center justify-between gap-2">
+						Sette e mezzo: si può cambiare il 4 ricevuto come prima carta
+						<input
+							type="checkbox"
+							checked={settings.setteSwapFour}
+							onChange={(e) =>
+								onChange({ ...settings, setteSwapFour: e.target.checked })
+							}
+						/>
+					</label>
 				</section>
 
 				<section className="flex flex-col gap-2">

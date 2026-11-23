@@ -3,6 +3,7 @@ import { ChipStack } from "../../components/ChipStack";
 import { DeckPile } from "../../components/DeckPile";
 import { EventOverlay } from "../../components/EventOverlay";
 import { FrenchCardView } from "../../components/FrenchCardView";
+import { GameOverDialog } from "../../components/GameOverDialog";
 import { Hand } from "../../components/Hand";
 import { Opponent } from "../../components/Opponent";
 import { Table } from "../../components/Table";
@@ -94,7 +95,11 @@ export function Poker({ names, difficulty, resume, onExit }: PokerProps) {
 					<ActionButton onClick={game.nextHand}>Prossima mano</ActionButton>
 				)}
 				{state.phase === "finePartita" && (
-					<ActionButton onClick={game.restart}>Nuova partita</ActionButton>
+					<GameOverDialog
+						won={!human.out}
+						onRestart={game.restart}
+						onExit={onExit}
+					/>
 				)}
 				<div className="flex items-end gap-6">
 					<Hand

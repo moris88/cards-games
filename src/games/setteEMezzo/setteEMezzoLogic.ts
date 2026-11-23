@@ -21,6 +21,8 @@ export interface SevenPlayer {
 	status: SevenStatus;
 	/** Esito dell'ultima mano in fiches (positivo = vinto) */
 	lastDelta: number;
+	/** Ha già cambiato il 4 in questa mano (assente nei salvataggi precedenti) */
+	swappedFour?: boolean;
 }
 
 export interface SevenState {
@@ -141,6 +143,7 @@ export function startRound(
 		hand: [],
 		status: alive(p) ? ("inGioco" as const) : p.status,
 		lastDelta: 0,
+		swappedFour: false,
 		bet:
 			!alive(p) || i === state.bankerIndex || p.isHuman
 				? 0
@@ -210,6 +213,33 @@ export function drawCard(state: SevenState): SevenState {
 	const next = { ...state, deck, players, events };
 	return isBust(hand) ? endTurn(next, "sballato") : next;
 }
+
+/** Il giocatore di turno può cambiare il 4 ricevuto come prima carta */
+export function canSwapFour(state: SevenState): boolean {
+	if (state.phase !== "turni") return false;
+	const p = state.players[currentPlayerIndex(state)];
+	return p.hand.length === 1 && p.hand[0].rank === 4 && !p.swappedFour;
+}
+
+/** Scarta il 4 e riceve una nuova carta (una sola volta per mano) */
+export function swapFour(state: SevenState): SevenState {
+	if (!canSwapFour(state)) return state;
+	const index = currentPlayerIndex(state);
+	const deck = [...state.deck];
+	const card = deck.pop() as NeapolitanCard;
+	const { isHuman, name } = state.players[index];
+	const players = state.players.map((p, i) =>
+		i === index ? { ...p, hand: [card], swappedFour: true } : p,
+	);
+	const events = isHuman
+		? state.events
+		: addEvent(state.events, `${name} cambia il 4`, "info");
+	return { ...state, deck, players, events };
+}
+
+/** La CPU Facile cambia il 4 a caso, le altre sempre */
+export const cpuWantsSwap = (difficulty: Difficulty) =>
+	difficulty !== "facile" || Math.random() < 0.5;
 
 export function endTurn(
 	state: SevenState,

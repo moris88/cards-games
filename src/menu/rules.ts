@@ -13,6 +13,7 @@ export const RULES: Record<GameId, GameRules> = {
 			"Il Re di denari è la matta: assume il valore più conveniente tra ½ e 7.",
 			"Prima di ricevere la carta ogni giocatore punta le sue fiches. Il mazziere gioca contro tutti.",
 			"La prima carta è coperta. Si chiede carta per avvicinarsi a 7½ senza superarlo: chi supera sballa e perde la puntata.",
+			"Variante (attivabile nelle opzioni): chi riceve un 4 come prima carta può scegliere di cambiarlo con una nuova carta, una sola volta.",
 			"Alla fine il mazziere gioca la sua mano. A parità di punti vince il mazziere.",
 			"Sette e mezzo reale (matta + 7 con due sole carte) paga il doppio e fa diventare mazziere.",
 			"Chi resta senza fiches è eliminato.",

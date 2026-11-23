@@ -7,6 +7,7 @@ import {
 	isReale,
 	placeBet,
 	settle,
+	swapFour,
 } from "./setteEMezzoLogic";
 
 const c = (suit: NeapolitanCard["suit"], rank: number): NeapolitanCard => ({
@@ -53,5 +54,32 @@ describe("sette e mezzo eventi", () => {
 		};
 		s = drawCard(s);
 		expect(s.events.some((e) => e.text === "Sballato!")).toBe(true);
+	});
+	it("il 4 come prima carta si cambia una sola volta", () => {
+		const state = placeBet(createGame(["Tu", "Cpu"], "medio"), 10);
+		const index = state.order[0];
+		const withFour = {
+			...state,
+			deck: [c("coppe", 4), c("spade", 6)],
+			players: state.players.map((p, i) =>
+				i === index ? { ...p, hand: [c("denari", 4)] } : p,
+			),
+		};
+		const once = swapFour(withFour);
+		expect(once.players[index].hand).toEqual([c("spade", 6)]);
+		const again = swapFour({
+			...once,
+			players: once.players.map((p, i) =>
+				i === index ? { ...p, hand: [c("bastoni", 4)] } : p,
+			),
+		});
+		expect(again.players[index].hand).toEqual([c("bastoni", 4)]);
+		const twoCards = {
+			...withFour,
+			players: withFour.players.map((p, i) =>
+				i === index ? { ...p, hand: [c("denari", 4), c("spade", 1)] } : p,
+			),
+		};
+		expect(swapFour(twoCards)).toBe(twoCards);
 	});
 });
