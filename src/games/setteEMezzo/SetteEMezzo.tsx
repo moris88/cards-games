@@ -2,6 +2,7 @@ import { ActionButton } from "../../components/ActionButton";
 import { BetPicker } from "../../components/BetPicker";
 import { DeckPile } from "../../components/DeckPile";
 import { EventOverlay } from "../../components/EventOverlay";
+import { GameOverDialog } from "../../components/GameOverDialog";
 import { Hand } from "../../components/Hand";
 import { NeapolitanCardView } from "../../components/NeapolitanCardView";
 import { Opponent } from "../../components/Opponent";
@@ -29,6 +30,7 @@ interface SetteEMezzoProps {
 	names: string[];
 	difficulty: Difficulty;
 	resume: boolean;
+	swapFour: boolean;
 	onExit: () => void;
 }
 
@@ -36,9 +38,10 @@ export function SetteEMezzo({
 	names,
 	difficulty,
 	resume,
+	swapFour,
 	onExit,
 }: SetteEMezzoProps) {
-	const game = useSetteEMezzo(names, difficulty, resume);
+	const game = useSetteEMezzo(names, difficulty, resume, swapFour);
 	const { state, activeIndex } = game;
 	const reveal = state.phase === "fineMano" || state.phase === "finePartita";
 	const human = state.players[0];
@@ -119,13 +122,20 @@ export function SetteEMezzo({
 						<>
 							<ActionButton onClick={game.draw}>Carta</ActionButton>
 							<ActionButton onClick={game.stand}>Sto</ActionButton>
+							{game.canSwap && (
+								<ActionButton onClick={game.swap}>Cambia il 4</ActionButton>
+							)}
 						</>
 					)}
 					{state.phase === "fineMano" && (
 						<ActionButton onClick={game.nextRound}>Prossima mano</ActionButton>
 					)}
 					{state.phase === "finePartita" && (
-						<ActionButton onClick={game.restart}>Nuova partita</ActionButton>
+						<GameOverDialog
+							won={human.status !== "eliminato"}
+							onRestart={game.restart}
+							onExit={onExit}
+						/>
 					)}
 				</div>
 			</div>

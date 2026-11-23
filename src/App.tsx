@@ -63,7 +63,9 @@ export default function App() {
 
 	return (
 		<LayoutGroup>
-			{game === "setteEMezzo" && <SetteEMezzo {...props} />}
+			{game === "setteEMezzo" && (
+				<SetteEMezzo {...props} swapFour={settings.setteSwapFour} />
+			)}
 			{game === "briscola" && <Briscola {...props} />}
 			{game === "scala40" && <Scala40 {...props} />}
 			{game === "tombola" && <Tombola {...props} />}

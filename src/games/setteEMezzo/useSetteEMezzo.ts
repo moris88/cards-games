@@ -2,8 +2,10 @@ import { useEffect } from "react";
 import type { Difficulty } from "../../core/settings";
 import { useSavedGame } from "../../core/useSavedGame";
 import {
+	canSwapFour,
 	collectCards,
 	cpuWantsCard,
+	cpuWantsSwap,
 	createGame,
 	currentPlayerIndex,
 	drawCard,
@@ -11,6 +13,7 @@ import {
 	placeBet,
 	type SevenState,
 	startRound,
+	swapFour,
 } from "./setteEMezzoLogic";
 
 const CPU_DELAY_MS = 900;
@@ -21,6 +24,7 @@ export function useSetteEMezzo(
 	names: string[],
 	difficulty: Difficulty,
 	resume: boolean,
+	swapAllowed: boolean,
 ) {
 	const [state, setState] = useSavedGame(
 		"setteEMezzo",
@@ -42,20 +46,24 @@ export function useSetteEMezzo(
 		}
 		if (!active || active.isHuman) return;
 		const timer = setTimeout(() => {
-			setState((s) =>
-				cpuWantsCard(active.hand, s.deck, difficulty)
+			setState((s) => {
+				if (swapAllowed && canSwapFour(s) && cpuWantsSwap(difficulty))
+					return swapFour(s);
+				return cpuWantsCard(active.hand, s.deck, difficulty)
 					? drawCard(s)
-					: endTurn(s),
-			);
+					: endTurn(s);
+			});
 		}, CPU_DELAY_MS);
 		return () => clearTimeout(timer);
-	}, [active, state.phase, difficulty, setState]);
+	}, [active, state.phase, difficulty, swapAllowed, setState]);
 
 	return {
 		state,
 		isHumanTurn: active?.isHuman ?? false,
 		activeIndex: active ? currentPlayerIndex(state) : -1,
 		bet: (amount: number) => setState((s) => placeBet(s, amount)),
+		canSwap: swapAllowed && (active?.isHuman ?? false) && canSwapFour(state),
+		swap: () => setState(swapFour),
 		draw: () => setState(drawCard),
 		stand: () => setState((s) => endTurn(s)),
 		nextRound: () => setState(collectCards),

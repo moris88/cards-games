@@ -34,6 +34,8 @@ export interface Settings {
 	klondikeDraw: 1 | 3;
 	/** Scopa: punti per vincere la partita */
 	scopaTarget: 11 | 16 | 21;
+	/** Sette e mezzo: chi riceve un 4 come prima carta può cambiarlo */
+	setteSwapFour: boolean;
 }
 
 const KEY = "settings";
@@ -54,6 +56,7 @@ export const DEFAULT_SETTINGS: Settings = {
 	},
 	klondikeDraw: 1,
 	scopaTarget: 11,
+	setteSwapFour: true,
 	cpuCount: 2,
 	playerName: "Tu",
 	cpuNames: ["Gennaro", "Concetta", "Totò", "Nunzia", "Pasquale"],
@@ -72,6 +75,7 @@ export function normalizeSettings(saved: Partial<Settings> | null): Settings {
 		scopaTarget: [11, 16, 21].includes(merged.scopaTarget)
 			? merged.scopaTarget
 			: DEFAULT_SETTINGS.scopaTarget,
+		setteSwapFour: merged.setteSwapFour !== false,
 		cpuCount: Math.min(
 			Math.max(Number(merged.cpuCount) || 1, 1),
 			MAX_OPPONENTS,
